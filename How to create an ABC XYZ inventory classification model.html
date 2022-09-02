@@ -1,0 +1,5653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        
+
+    <!-- General -->
+    <title>How to create an ABC XYZ inventory classification model</title>
+    <meta name="generator" content="Jekyll" />
+    <meta name="description" content="The ABC XYZ inventory classification model is built on top of ABC inventory analysis and helps you keep better control of stock by examining demand variability." />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <link rel="canonical" href="https://practicaldatascience.co.uk/data-science/how-to-create-an-abc-xyz-inventory-classification-model" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@" />
+    <meta name="twitter:creator" content="@" />
+    <meta name="twitter:title" content="How to create an ABC XYZ inventory classification model" />
+    <meta name="twitter:description" content="The ABC XYZ inventory classification model is built on top of ABC inventory analysis and helps you keep better control of stock by examining demand variability." />
+    <meta name="twitter:image" content="https://practicaldatascience.co.uk/assets/images/posts/distribution.jpg" />
+    <meta name="twitter:url" content="https://practicaldatascience.co.uk/data-science/how-to-create-an-abc-xyz-inventory-classification-model" />
+
+    <!-- OpenGraph -->
+    <meta property="og:locale" content="en_GB" />
+    <meta property="og:title" content="How to create an ABC XYZ inventory classification model" />
+    <meta property="og:description" content="The ABC XYZ inventory classification model is built on top of ABC inventory analysis and helps you keep better control of stock by examining demand variability." />
+    <meta property="og:image" content="https://practicaldatascience.co.uk/assets/images/posts/distribution.jpg" />
+    <meta property="og:url" content="https://practicaldatascience.co.uk/data-science/how-to-create-an-abc-xyz-inventory-classification-model" />
+
+    
+    <meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2021-03-05 00:00:00 +0000" />
+                
+        <!-- Schema.org BreadcrumbList -->
+        <script type="application/ld+json">
+        {
+         "@context": "http://schema.org",
+         "@type": "BreadcrumbList",
+         "itemListElement":
+         [
+          {
+           "@type": "ListItem",
+           "position": 1,
+           "item":
+           {
+            "@id": "https://practicaldatascience.co.uk/",
+            "name": "Practical Data Science"
+            }
+          },
+          {
+           "@type": "ListItem",
+           "position": 2,
+           "item":
+           {
+            "@id": "https://practicaldatascience.co.uk//",
+            "name": "Data Science"
+            }
+          },
+          {
+           "@type": "ListItem",
+          "position": 3,
+          "item":
+           {
+             "@id": "https://practicaldatascience.co.uk/data-science/how-to-create-an-abc-xyz-inventory-classification-model",
+             "name": "How to create an ABC XYZ inventory classification model"
+           }
+          }
+         ]
+        }
+        </script>
+        
+    
+
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Person",
+  "name": "Matt Clarke",
+  "@id": "https://practicaldatascience.co.uk/about",
+  "nationality": "British",
+  "gender": "Male",
+  "Description": "Ecommerce and Marketing data science specialist",
+  "jobTitle": "Ecommerce and Marketing Director",
+  "url": "https://practicaldatascience.co.uk",
+  "image": "https://practicaldatascience.co.uk/assets/images/posts/matt-clarke.jpg",
+  "sameAs": [
+    "https://twitter.com/EcommerceMatt",
+    "https://www.linkedin.com/in/mattclarke/",
+    "https://practicaldatascience.co.uk/about",
+    "https://github.com/flyandlure",
+    "https://github.com/practicaldatascience"
+  ],
+
+  "alumniOf": [
+    {
+     "@type": "EducationalOrganization",
+     "name": "Imperial College London",
+     "sameAs": "https://ic.ac.uk"
+    },
+    {
+     "@type": "EducationalOrganization",
+     "name": "University of Leeds",
+     "sameAs": "https://leeds.ac.uk"
+    },
+    {
+     "@type": "EducationalOrganization",
+     "name": "Aberystwyth University",
+     "sameAs": "https://aber.ac.uk"
+    },
+    {
+     "@type": "EducationalOrganization",
+     "name": "Manchester Metropolitan University",
+     "sameAs": "https://mmu.ac.uk"
+    }
+]
+
+}
+</script>
+<!-- End -->
+    <link rel="preconnect" href="https://www.google-analytics.com" crossorigin>
+    <link rel="preconnect" href="https://chimpstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link href='https://d33wubrfki0l68.cloudfront.net/bundles/18e929fa41b957d168ca902b02abf8fc3bea7f6e.css' rel='stylesheet'/>
+    
+
+    <style type="text/css">
+    /* cyrillic-ext */
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/firasans/v11/va9B4kDNxMZdWfMOD5VnPKreSxf6TF0.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/firasans/v11/va9B4kDNxMZdWfMOD5VnPKreQhf6TF0.woff2) format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/firasans/v11/va9B4kDNxMZdWfMOD5VnPKreShf6TF0.woff2) format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/firasans/v11/va9B4kDNxMZdWfMOD5VnPKreRRf6TF0.woff2) format('woff2');
+  unicode-range: U+0370-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/firasans/v11/va9B4kDNxMZdWfMOD5VnPKreSRf6TF0.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/firasans/v11/va9B4kDNxMZdWfMOD5VnPKreSBf6TF0.woff2) format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/firasans/v11/va9B4kDNxMZdWfMOD5VnPKreRhf6.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/firasans/v11/va9E4kDNxMZdWfMOD5VvmojLeTY.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/firasans/v11/va9E4kDNxMZdWfMOD5Vvk4jLeTY.woff2) format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/firasans/v11/va9E4kDNxMZdWfMOD5Vvm4jLeTY.woff2) format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/firasans/v11/va9E4kDNxMZdWfMOD5VvlIjLeTY.woff2) format('woff2');
+  unicode-range: U+0370-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/firasans/v11/va9E4kDNxMZdWfMOD5VvmIjLeTY.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/firasans/v11/va9E4kDNxMZdWfMOD5VvmYjLeTY.woff2) format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/firasans/v11/va9E4kDNxMZdWfMOD5Vvl4jL.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/firasans/v11/va9B4kDNxMZdWfMOD5VnLK3eSxf6TF0.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/firasans/v11/va9B4kDNxMZdWfMOD5VnLK3eQhf6TF0.woff2) format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/firasans/v11/va9B4kDNxMZdWfMOD5VnLK3eShf6TF0.woff2) format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/firasans/v11/va9B4kDNxMZdWfMOD5VnLK3eRRf6TF0.woff2) format('woff2');
+  unicode-range: U+0370-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/firasans/v11/va9B4kDNxMZdWfMOD5VnLK3eSRf6TF0.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/firasans/v11/va9B4kDNxMZdWfMOD5VnLK3eSBf6TF0.woff2) format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/firasans/v11/va9B4kDNxMZdWfMOD5VnLK3eRhf6.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/firasans/v11/va9B4kDNxMZdWfMOD5VnFK_eSxf6TF0.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/firasans/v11/va9B4kDNxMZdWfMOD5VnFK_eQhf6TF0.woff2) format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/firasans/v11/va9B4kDNxMZdWfMOD5VnFK_eShf6TF0.woff2) format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/firasans/v11/va9B4kDNxMZdWfMOD5VnFK_eRRf6TF0.woff2) format('woff2');
+  unicode-range: U+0370-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/firasans/v11/va9B4kDNxMZdWfMOD5VnFK_eSRf6TF0.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/firasans/v11/va9B4kDNxMZdWfMOD5VnFK_eSBf6TF0.woff2) format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/firasans/v11/va9B4kDNxMZdWfMOD5VnFK_eRhf6.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+    </style>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WE3CPPHSF4"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-WE3CPPHSF4');
+    </script>
+</head>
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-170957735-1', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+<body>
+
+<nav class="navbar navbar-expand-xl navbar-light bg-light">
+
+  <div class="container">
+
+    <a class="navbar-brand" href="/">
+      <i class="fas fa-chart-line navbar-icon"></i>&nbsp;
+      Practical Data Science
+    </a>
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-label="Toggle nav">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mr-auto">
+            
+            <li class="nav-item">
+              <a class="nav-link" href="/data-science">Data Science</a>
+            </li>
+            
+            <li class="nav-item">
+              <a class="nav-link" href="/machine-learning">Machine Learning</a>
+            </li>
+            
+            <li class="nav-item">
+              <a class="nav-link" href="/data-engineering">Data Engineering</a>
+            </li>
+            
+            <li class="nav-item courses">
+                <a class="nav-link" href="/data-science-courses">Courses</a>
+            </li>
+        </ul>
+        <a class="btn btn-primary my-2 my-sm-2 btn-search" href="/search">Search</a>
+    </div>
+
+  </div>
+</nav>
+
+
+<div class="site-content ">
+
+    <div class="container">
+        <div class="main-content">
+            </div>
+</div>
+<!-- end container and main-content-->
+
+<div class="post-header">
+    <div class="container">
+
+        <div class="breadcrumbs">
+
+<a href="/">Home</a>
+
+  
+    / <a href="/data-science/">Data science</a>
+  
+
+  
+    / How to create an ABC XYZ inventory classification model
+  
+
+</div>
+
+        <h1 class="posttitle">How to create an ABC XYZ inventory classification model</h1>
+
+        
+        <h2 class="standfirst">The ABC XYZ inventory classification model is built on top of ABC inventory analysis and helps you keep better control of stock by examining demand variability.</h2>
+        
+
+    </div>
+</div>
+
+<!-- re-start container and main-content-->
+<div class="container">
+<div class="main-content">
+
+<div class="row">
+  <div class="col-lg-9 col-md-12">
+    <div class="post-box">
+        
+<div class="entry-featured-image">
+    
+    <img class="featured-image lazyimg " src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAACCAQAAAA3fa6RAAAADklEQVR42mNkAANGCAUAACMAA2w/AMgAAAAASUVORK5CYII=" data-src="https://d33wubrfki0l68.cloudfront.net/964d77d47cf620eab8f75db4471657619320f20e/aee12/assets/images/posts/distribution.jpg" alt="How to create an ABC XYZ inventory classification model">
+    
+
+    <div class="row image-caption">
+        <div class="col-md-9">
+            
+            <i class="fa fa-camera"></i> Pictures by Chuttersnap and Nana Smirnova, Unsplash.
+            
+        </div>
+        <div class="col-md-3"><i class="fa fa-clock"></i> 
+
+53 minutes to read
+</div>
+    </div>
+
+</div>
+
+        <div class="post-tags">
+
+    
+    
+    <a class="smoothscroll badge badge-primary text-capitalize post-tag" href="/data-science">Data Science</a>
+    
+
+    
+    
+    <a class="smoothscroll badge badge-primary text-capitalize post-tag" href="/tag/operations-management">Operations management</a>
+    
+    <a class="smoothscroll badge badge-primary text-capitalize post-tag" href="/tag/pandas">Pandas</a>
+    
+    <a class="smoothscroll badge badge-primary text-capitalize post-tag" href="/tag/technical-ecommerce">Technical ecommerce</a>
+    
+
+</div>
+        <div class="article-post">
+    <p>As everyone who works in ecommerce will know, stock-outs on your key lines can have a massive negative impact on sales and your marketing costs. In many cases, you’ll be paying a pound or so to get every visitor onto your site via your paid search ads, so if they land on your product page and the product they want is out of stock, you’ll be burning money.</p>
+
+<blockquote>
+  <p>Most of the customers who land on a product page and find a product out of stock will bounce and go back to Google to find another retailer who has what they want available to buy right now.</p>
+</blockquote>
+
+<p>While some stock-outs are always inevitable and unavoidable, there are several ways procurement managers can keep their stock under tighter control to help reduce the likelihood of expensive stock-outs on the lines that contribute the most or are hardest to control.</p>
+
+<h4 id="inventory-management-in-ecommerce">Inventory management in ecommerce</h4>
+
+<p>ABC inventory management is the classic approach to managing stock. This calculates the revenue generated by each SKU and ranks its cumulative percentage contribution to the total revenue generated from all SKUs.</p>
+
+<p>As it’s based on the Pareto principle, or 80/20 rule, the products generating the top 80% of your revenue are assigned to Class A and get close observation to prevent stock-outs because they generate so much. The next 10% of revenue-generating SKUs get assigned to Class B and get slightly less control, while the ones in Class C don’t generate much and can be spared the granular level of control given to the As and Bs.</p>
+
+<blockquote>
+  <p>While ABC inventory management is extremely effective, there’s more to controlling stock than simply having the most popular lines in stock to sell.</p>
+</blockquote>
+
+<p>Sometimes demand for items can change over time, is seasonal, or is subject to changes in demand caused by product lifecycle, economic factors, competitor activity, or marketing promotions. These drivers all impact the ability to forecast demand for the affected SKUs, making costly stock-outs much more likely.</p>
+
+<p>This is where XYZ inventory management comes in. Unlike ABC inventory management, which looks at the revenue contribution of each SKU, XYZ inventory management classifies SKUs according to the variability of their demand. When demand for products is fairly constant forecasting is relatively straightforward. However, when it’s subject to variation demand forecasting becomes a challenge - or a nightmare.</p>
+
+<h4 id="how-xyz-inventory-management-works">How XYZ inventory management works</h4>
+
+<p>With XYZ inventory management, the sales demand for each SKU is measured over a long period of time, in order to capture seasonal variations in demand, then the variance is calculated for each SKU and scores are ranked according to their variability.</p>
+
+<ul>
+  <li>
+    <p><strong>Class X:</strong> Products assigned to Class X are those which show the least variation in demand. Sales of these products are fairly constant, which means they’re easier for procurement managers to forecast and stock outs should be straightforward to avoid.</p>
+  </li>
+  <li>
+    <p><strong>Class Y:</strong> Products assigned to Class Y are more variable than those in Class X. Demand can change over time, due to factors like seasonality, so they’re harder to accurately forecast.</p>
+  </li>
+  <li>
+    <p><strong>Class Z:</strong> Finally, Class Z products are highly variable. Demand goes up and down and is really hard to predict, so avoid stock outs can be really challenging, unless you sit on large stocks that may not turnover quickly.</p>
+  </li>
+</ul>
+
+<h4 id="combining-abc-and-xyz">Combining ABC and XYZ</h4>
+
+<p>Since both ABC inventory management and XYZ inventory management both tackle different things and are both extremely useful to operations managers or procurement staff, they’re often combined as ABC-XYZ inventory management.</p>
+
+<p>Here, as the name suggests, the ABC class and the XYZ class assignation for each SKU is concatenated to form AX, AY, AZ, BX, BY, BZ, CX, CY, and CZ classes that help managers understand both the importance to revenue and the variation in demand.</p>
+
+<p>In this project we’re going to use a 12 month snapshot of ecommerce transactional data to create an ABC-XYZ inventory management model which classifies each SKU, and proposes some recommendations for their management to help the retailer avoid too many costly stock-outs.</p>
+
+<p><img src="https://d33wubrfki0l68.cloudfront.net/b3fc5e8d40577c3aca87704d1ddd5af867bafc2e/a30f8/assets/images/posts/boxes.jpg" alt="png" /></p>
+
+<h4 id="load-the-packages">Load the packages</h4>
+
+<p>For this project we’re mostly using Pandas, plus the timedelta module from the Python datetime package, as well as Numpy for some mathematical calculations and Seaborn and Matplotlib for visualising the data. You can do this whole project in steps inside a Jupyter notebook if you want to follow along.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">timedelta</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="n">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sns</span><span class="p">.</span><span class="n">set_style</span><span class="p">(</span><span class="s">"dark"</span><span class="p">)</span>
+<span class="n">sns</span><span class="p">.</span><span class="nb">set</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h4 id="load-transaction-item-data">Load transaction item data</h4>
+
+<p>Since we need to know the quantity and revenue each SKU generates over time, we need transaction item data which you should be able to extract easily from your SQL database. I’ve pulled in the whole lot, but we actually only need data for the past 12 full months.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_order_items</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'order_items_processed.csv'</span><span class="p">,</span> <span class="n">low_memory</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="n">df_order_items</span> <span class="o">=</span> <span class="n">df_order_items</span><span class="p">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">'Unnamed: 0'</span><span class="p">])</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_order_items</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+    
+    .dataframe thead th {
+        text-align: right;
+    }
+
+</style>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sku</th>
+      <th>id</th>
+      <th>revenue</th>
+      <th>quantity</th>
+      <th>date_created</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>770</td>
+      <td>1541255</td>
+      <td>22.94</td>
+      <td>1</td>
+      <td>2017-04-07 05:54:37</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>86910</td>
+      <td>1052928</td>
+      <td>30.38</td>
+      <td>2</td>
+      <td>2017-04-07 05:54:37</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2971</td>
+      <td>1167973</td>
+      <td>20.69</td>
+      <td>1</td>
+      <td>2017-04-07 05:54:37</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>118F</td>
+      <td>2123242</td>
+      <td>44.62</td>
+      <td>2</td>
+      <td>2017-04-07 07:32:54</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2691</td>
+      <td>242074</td>
+      <td>15.00</td>
+      <td>1</td>
+      <td>2017-04-07 08:18:45</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h4 id="set-order-date-field-type">Set order date field type</h4>
+
+<p>To check your transaction item data is correctly formatted you can use the <code class="language-plaintext highlighter-rouge">info()</code> function on the dataframe. Specifically, we need to make sure the order date field is set to a <code class="language-plaintext highlighter-rouge">datetime</code> format. You can use the Pandas <code class="language-plaintext highlighter-rouge">to_datetime()</code> function to reformat it if it’s not.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_order_items</span><span class="p">.</span><span class="n">info</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
+RangeIndex: 477074 entries, 0 to 477073
+Data columns (total 5 columns):
+ #   Column        Non-Null Count   Dtype         
+---  ------        --------------   -----         
+ 0   sku           477073 non-null  object        
+ 1   id            477074 non-null  int64         
+ 2   revenue       477074 non-null  float64       
+ 3   quantity      477074 non-null  int64         
+ 4   date_created  477074 non-null  datetime64[ns]
+dtypes: datetime64[ns](1), float64(1), int64(2), object(1)
+memory usage: 18.2+ MB
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_order_items</span><span class="p">[</span><span class="s">'date_created'</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df_order_items</span><span class="p">[</span><span class="s">'date_created'</span><span class="p">])</span>
+</code></pre></div></div>
+
+<h4 id="extract-orders-for-a-12-month-period">Extract orders for a 12 month period</h4>
+
+<p>Next we’ll filter our dataframe so it includes only the data for the past 12 full months. It’s vital that the periods are entire calendar months, because our calculations are going to be monthly, so a partial dataset for a month would mislead the model.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_12m</span> <span class="o">=</span> <span class="n">df_order_items</span><span class="p">[(</span><span class="n">df_order_items</span><span class="p">[</span><span class="s">'date_created'</span><span class="p">]</span> <span class="o">&gt;</span> <span class="s">'2019-10-01'</span><span class="p">)</span> <span class="o">&amp;</span> \
+                                   <span class="p">(</span><span class="n">df_order_items</span><span class="p">[</span><span class="s">'date_created'</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="s">'2020-10-01'</span><span class="p">)]</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_12m</span><span class="p">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+    
+    .dataframe thead th {
+        text-align: right;
+    }
+
+</style>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sku</th>
+      <th>id</th>
+      <th>revenue</th>
+      <th>quantity</th>
+      <th>date_created</th>
+      <th>month</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>408141</th>
+      <td>6129200</td>
+      <td>1165802</td>
+      <td>6.69</td>
+      <td>1</td>
+      <td>2020-07-08 21:55:17</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>443292</th>
+      <td>112TC</td>
+      <td>1880</td>
+      <td>7.56</td>
+      <td>4</td>
+      <td>2020-08-25 20:06:30</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>463999</th>
+      <td>121415</td>
+      <td>1608182</td>
+      <td>24.99</td>
+      <td>1</td>
+      <td>2020-09-26 00:43:07</td>
+      <td>9</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h4 id="calculate-monthly-sales-per-sku">Calculate monthly sales per SKU</h4>
+
+<p>Now we have a 12 month dataset we can add a new column to define the month number. You can get this by appending <code class="language-plaintext highlighter-rouge">dt.month</code> to your <code class="language-plaintext highlighter-rouge">datetime</code> column and then assign the value to a new column in the dataframe.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_12m</span> <span class="o">=</span> <span class="n">df_12m</span><span class="p">.</span><span class="n">assign</span><span class="p">(</span><span class="n">month</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df_12m</span><span class="p">[</span><span class="s">'date_created'</span><span class="p">]).</span><span class="n">dt</span><span class="p">.</span><span class="n">month</span> <span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_12m</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+    
+    .dataframe thead th {
+        text-align: right;
+    }
+
+</style>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sku</th>
+      <th>id</th>
+      <th>revenue</th>
+      <th>quantity</th>
+      <th>date_created</th>
+      <th>month</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>237361</th>
+      <td>190588</td>
+      <td>2856081</td>
+      <td>63.98</td>
+      <td>2</td>
+      <td>2019-10-01 02:08:01</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>237362</th>
+      <td>415</td>
+      <td>96667</td>
+      <td>74.15</td>
+      <td>1</td>
+      <td>2019-10-01 02:52:50</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>237363</th>
+      <td>1025560</td>
+      <td>945539</td>
+      <td>6.79</td>
+      <td>1</td>
+      <td>2019-10-01 06:49:04</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>237364</th>
+      <td>1832</td>
+      <td>1345701</td>
+      <td>22.49</td>
+      <td>1</td>
+      <td>2019-10-01 07:28:22</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>237365</th>
+      <td>394898</td>
+      <td>2090516</td>
+      <td>7.16</td>
+      <td>4</td>
+      <td>2019-10-01 07:28:22</td>
+      <td>10</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p>To get a quick overview of the seasonality in the dataset we can use Seaborn to plot the <code class="language-plaintext highlighter-rouge">quantity</code> of units sold in each month within the period. We can see that the warmer months from May to September see more sales and that December and April are quieter than the rest, based on the number of units sold.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="p">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">"month"</span><span class="p">,</span> 
+                 <span class="n">y</span><span class="o">=</span><span class="s">"quantity"</span><span class="p">,</span> 
+                 <span class="n">data</span><span class="o">=</span><span class="n">df_12m</span><span class="p">,</span>
+                 <span class="n">palette</span><span class="o">=</span><span class="s">"Blues_d"</span><span class="p">)</span>\
+                <span class="p">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">"Quantity by month"</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><img src="https://d33wubrfki0l68.cloudfront.net/81e39b6c80a5813f3074c7cb76fa1598c593d59c/c3dbb/assets/images/posts/xyz_output_22_0.png" alt="png" /></p>
+
+<p>Examining the revenue generated by month shows a similar picture but is better at showing how the value of orders change over the course of the year. Again the summer months are busier, with revenue peaking in September.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="p">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">"month"</span><span class="p">,</span> 
+                 <span class="n">y</span><span class="o">=</span><span class="s">"revenue"</span><span class="p">,</span> 
+                 <span class="n">data</span><span class="o">=</span><span class="n">df_12m</span><span class="p">,</span>
+                 <span class="n">palette</span><span class="o">=</span><span class="s">"Blues_d"</span><span class="p">)</span>\
+                <span class="p">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">"Revenue by month"</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><img src="https://d33wubrfki0l68.cloudfront.net/487e31e91123a14d6e576016120d97d519ef28a2/384e1/assets/images/posts/xyz_output_24_0.png" alt="png" /></p>
+
+<p>Now we’ve taken a look at the data, we need to reformat it so we’ve got the monthly data for each SKU neatly partitioned in a Pandas dataframe. First, we’ll <code class="language-plaintext highlighter-rouge">groupby()</code> the <code class="language-plaintext highlighter-rouge">sku</code> and <code class="language-plaintext highlighter-rouge">month</code> column and create a dataframe based on the <code class="language-plaintext highlighter-rouge">sum()</code> of the <code class="language-plaintext highlighter-rouge">quantity</code> field.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_12m_units</span> <span class="o">=</span> <span class="n">df_12m</span><span class="p">.</span><span class="n">groupby</span><span class="p">([</span><span class="s">'sku'</span><span class="p">,</span><span class="s">'month'</span><span class="p">])[</span><span class="s">'quantity'</span><span class="p">].</span><span class="nb">sum</span><span class="p">().</span><span class="n">to_frame</span><span class="p">().</span><span class="n">reset_index</span><span class="p">()</span>
+<span class="n">df_12m_units</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+    
+    .dataframe thead th {
+        text-align: right;
+    }
+
+</style>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sku</th>
+      <th>month</th>
+      <th>quantity</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>001TC</td>
+      <td>1</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>001TC</td>
+      <td>2</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>001TC</td>
+      <td>3</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>001TC</td>
+      <td>4</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>001TC</td>
+      <td>6</td>
+      <td>4</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p>Since our above data is in long format, rather than wide format, we need to <a href="https://practicaldatascience.co.uk/data-science/how-to-use-the-pandas-melt-function-to-reshape-your-data">reshape the data using Pandas</a>. We can do this using the <code class="language-plaintext highlighter-rouge">pivot()</code> function. We’ll put each SKU on its own line and store the quantity of units sold in each month in its own column.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_12m_units</span> <span class="o">=</span> <span class="n">df_12m_units</span><span class="p">.</span><span class="n">pivot</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="s">'sku'</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="s">'month'</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="s">'quantity'</span><span class="p">)</span>\
+                           <span class="p">.</span><span class="n">add_prefix</span><span class="p">(</span><span class="s">'m'</span><span class="p">).</span><span class="n">reset_index</span><span class="p">().</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">df_12m_units</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+    
+    .dataframe thead th {
+        text-align: right;
+    }
+
+</style>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>month</th>
+      <th>sku</th>
+      <th>m1</th>
+      <th>m2</th>
+      <th>m3</th>
+      <th>m4</th>
+      <th>m5</th>
+      <th>m6</th>
+      <th>m7</th>
+      <th>m8</th>
+      <th>m9</th>
+      <th>m10</th>
+      <th>m11</th>
+      <th>m12</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>001TC</td>
+      <td>5.0</td>
+      <td>3.0</td>
+      <td>9.0</td>
+      <td>6.0</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>2.0</td>
+      <td>6.0</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>003TC</td>
+      <td>11.0</td>
+      <td>6.0</td>
+      <td>12.0</td>
+      <td>29.0</td>
+      <td>25.0</td>
+      <td>19.0</td>
+      <td>5.0</td>
+      <td>8.0</td>
+      <td>3.0</td>
+      <td>0.0</td>
+      <td>5.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>005A</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>3.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0068S</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>3.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>5.0</td>
+      <td>4.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>008APCS</td>
+      <td>6.0</td>
+      <td>3.0</td>
+      <td>12.0</td>
+      <td>18.0</td>
+      <td>38.0</td>
+      <td>5.0</td>
+      <td>15.0</td>
+      <td>15.0</td>
+      <td>5.0</td>
+      <td>0.0</td>
+      <td>3.0</td>
+      <td>11.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h4 id="calculate-standard-deviation-in-demand">Calculate standard deviation in demand</h4>
+
+<p>Next we need to calculate the standard deviation in the monthly demand for each SKU. We can do this by creating a subset of the month columns and appending <code class="language-plaintext highlighter-rouge">.std(axis=1)</code> in order to calculate the standard deviation in the values within each row. We’ll assign that value back to the dataframe in a new column.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_12m_units</span><span class="p">[</span><span class="s">'std_demand'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_12m_units</span><span class="p">[[</span><span class="s">'m1'</span><span class="p">,</span><span class="s">'m2'</span><span class="p">,</span><span class="s">'m3'</span><span class="p">,</span><span class="s">'m4'</span><span class="p">,</span><span class="s">'m5'</span><span class="p">,</span><span class="s">'m6'</span><span class="p">,</span>
+                                    <span class="s">'m7'</span><span class="p">,</span><span class="s">'m8'</span><span class="p">,</span><span class="s">'m9'</span><span class="p">,</span><span class="s">'m10'</span><span class="p">,</span><span class="s">'m11'</span><span class="p">,</span><span class="s">'m12'</span><span class="p">]].</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_12m_units</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+    
+    .dataframe thead th {
+        text-align: right;
+    }
+
+</style>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>month</th>
+      <th>sku</th>
+      <th>m1</th>
+      <th>m2</th>
+      <th>m3</th>
+      <th>m4</th>
+      <th>m5</th>
+      <th>m6</th>
+      <th>m7</th>
+      <th>m8</th>
+      <th>m9</th>
+      <th>m10</th>
+      <th>m11</th>
+      <th>m12</th>
+      <th>std_demand</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>001TC</td>
+      <td>5.0</td>
+      <td>3.0</td>
+      <td>9.0</td>
+      <td>6.0</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>2.0</td>
+      <td>6.0</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>0.0</td>
+      <td>2.806918</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>003TC</td>
+      <td>11.0</td>
+      <td>6.0</td>
+      <td>12.0</td>
+      <td>29.0</td>
+      <td>25.0</td>
+      <td>19.0</td>
+      <td>5.0</td>
+      <td>8.0</td>
+      <td>3.0</td>
+      <td>0.0</td>
+      <td>5.0</td>
+      <td>0.0</td>
+      <td>9.488031</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>005A</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>3.0</td>
+      <td>0.0</td>
+      <td>0.866025</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0068S</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>3.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>5.0</td>
+      <td>4.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>1.825742</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>008APCS</td>
+      <td>6.0</td>
+      <td>3.0</td>
+      <td>12.0</td>
+      <td>18.0</td>
+      <td>38.0</td>
+      <td>5.0</td>
+      <td>15.0</td>
+      <td>15.0</td>
+      <td>5.0</td>
+      <td>0.0</td>
+      <td>3.0</td>
+      <td>11.0</td>
+      <td>10.255449</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h4 id="calculate-total-demand">Calculate total demand</h4>
+
+<p>Since we also need to know the annual demand, we next need to calculate the <code class="language-plaintext highlighter-rouge">sum()</code> of all of the monthly data, which we can do simply by adding the columns together and then assigning them to a new field using the <code class="language-plaintext highlighter-rouge">assign()</code> function.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_12m_units</span> <span class="o">=</span> <span class="n">df_12m_units</span><span class="p">.</span><span class="n">assign</span><span class="p">(</span><span class="n">total_demand</span> <span class="o">=</span> <span class="n">df_12m_units</span><span class="p">[</span><span class="s">'m1'</span><span class="p">]</span> <span class="o">+</span> <span class="n">df_12m_units</span><span class="p">[</span><span class="s">'m2'</span><span class="p">]</span> <span class="o">+</span> \
+                                                 <span class="n">df_12m_units</span><span class="p">[</span><span class="s">'m3'</span><span class="p">]</span> <span class="o">+</span> <span class="n">df_12m_units</span><span class="p">[</span><span class="s">'m4'</span><span class="p">]</span> <span class="o">+</span> \
+                                                 <span class="n">df_12m_units</span><span class="p">[</span><span class="s">'m5'</span><span class="p">]</span> <span class="o">+</span> <span class="n">df_12m_units</span><span class="p">[</span><span class="s">'m6'</span><span class="p">]</span> <span class="o">+</span> \
+                                                 <span class="n">df_12m_units</span><span class="p">[</span><span class="s">'m7'</span><span class="p">]</span> <span class="o">+</span> <span class="n">df_12m_units</span><span class="p">[</span><span class="s">'m8'</span><span class="p">]</span> <span class="o">+</span> \
+                                                 <span class="n">df_12m_units</span><span class="p">[</span><span class="s">'m9'</span><span class="p">]</span> <span class="o">+</span> <span class="n">df_12m_units</span><span class="p">[</span><span class="s">'m10'</span><span class="p">]</span> <span class="o">+</span> \
+                                                 <span class="n">df_12m_units</span><span class="p">[</span><span class="s">'m11'</span><span class="p">]</span> <span class="o">+</span> <span class="n">df_12m_units</span><span class="p">[</span><span class="s">'m12'</span><span class="p">]</span>
+                                  <span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_12m_units</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+    
+    .dataframe thead th {
+        text-align: right;
+    }
+
+</style>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>month</th>
+      <th>sku</th>
+      <th>m1</th>
+      <th>m2</th>
+      <th>m3</th>
+      <th>m4</th>
+      <th>m5</th>
+      <th>m6</th>
+      <th>m7</th>
+      <th>m8</th>
+      <th>m9</th>
+      <th>m10</th>
+      <th>m11</th>
+      <th>m12</th>
+      <th>std_demand</th>
+      <th>total_demand</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>001TC</td>
+      <td>5.0</td>
+      <td>3.0</td>
+      <td>9.0</td>
+      <td>6.0</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>2.0</td>
+      <td>6.0</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>0.0</td>
+      <td>2.806918</td>
+      <td>44.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>003TC</td>
+      <td>11.0</td>
+      <td>6.0</td>
+      <td>12.0</td>
+      <td>29.0</td>
+      <td>25.0</td>
+      <td>19.0</td>
+      <td>5.0</td>
+      <td>8.0</td>
+      <td>3.0</td>
+      <td>0.0</td>
+      <td>5.0</td>
+      <td>0.0</td>
+      <td>9.488031</td>
+      <td>123.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>005A</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>3.0</td>
+      <td>0.0</td>
+      <td>0.866025</td>
+      <td>3.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0068S</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>3.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>5.0</td>
+      <td>4.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>1.825742</td>
+      <td>20.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>008APCS</td>
+      <td>6.0</td>
+      <td>3.0</td>
+      <td>12.0</td>
+      <td>18.0</td>
+      <td>38.0</td>
+      <td>5.0</td>
+      <td>15.0</td>
+      <td>15.0</td>
+      <td>5.0</td>
+      <td>0.0</td>
+      <td>3.0</td>
+      <td>11.0</td>
+      <td>10.255449</td>
+      <td>131.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h4 id="calculate-average-monthly-demand">Calculate average monthly demand</h4>
+
+<p>To calculate the average demand for each SKU across the year we can divide the <code class="language-plaintext highlighter-rouge">total_demand</code> column value by the number of months in the dataset - 12 - to obtain the mean for the period.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_12m_units</span> <span class="o">=</span> <span class="n">df_12m_units</span><span class="p">.</span><span class="n">assign</span><span class="p">(</span><span class="n">avg_demand</span> <span class="o">=</span> <span class="n">df_12m_units</span><span class="p">[</span><span class="s">'total_demand'</span><span class="p">]</span> <span class="o">/</span> <span class="mi">12</span> <span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_12m_units</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+    
+    .dataframe thead th {
+        text-align: right;
+    }
+
+</style>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>month</th>
+      <th>sku</th>
+      <th>m1</th>
+      <th>m2</th>
+      <th>m3</th>
+      <th>m4</th>
+      <th>m5</th>
+      <th>m6</th>
+      <th>m7</th>
+      <th>m8</th>
+      <th>m9</th>
+      <th>m10</th>
+      <th>m11</th>
+      <th>m12</th>
+      <th>std_demand</th>
+      <th>total_demand</th>
+      <th>avg_demand</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>001TC</td>
+      <td>5.0</td>
+      <td>3.0</td>
+      <td>9.0</td>
+      <td>6.0</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>2.0</td>
+      <td>6.0</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>0.0</td>
+      <td>2.806918</td>
+      <td>44.0</td>
+      <td>3.666667</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>003TC</td>
+      <td>11.0</td>
+      <td>6.0</td>
+      <td>12.0</td>
+      <td>29.0</td>
+      <td>25.0</td>
+      <td>19.0</td>
+      <td>5.0</td>
+      <td>8.0</td>
+      <td>3.0</td>
+      <td>0.0</td>
+      <td>5.0</td>
+      <td>0.0</td>
+      <td>9.488031</td>
+      <td>123.0</td>
+      <td>10.250000</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>005A</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>3.0</td>
+      <td>0.0</td>
+      <td>0.866025</td>
+      <td>3.0</td>
+      <td>0.250000</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0068S</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>3.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>5.0</td>
+      <td>4.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>1.825742</td>
+      <td>20.0</td>
+      <td>1.666667</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>008APCS</td>
+      <td>6.0</td>
+      <td>3.0</td>
+      <td>12.0</td>
+      <td>18.0</td>
+      <td>38.0</td>
+      <td>5.0</td>
+      <td>15.0</td>
+      <td>15.0</td>
+      <td>5.0</td>
+      <td>0.0</td>
+      <td>3.0</td>
+      <td>11.0</td>
+      <td>10.255449</td>
+      <td>131.0</td>
+      <td>10.916667</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h4 id="calculate-coefficient-of-variation-in-demand">Calculate Coefficient of Variation in demand</h4>
+
+<p>Finally, we can calculate the amount of variation seen in demand for each SKU across the year. To measure the variation, and therefore the forecastability, we can use a calculation called the Coefficient of Variation or CV. This is the mean demand over the standard deviation in demand. A value closer to zero implies that there’s minimal variation and higher predictability, while high values imply the opposite.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_12m_units</span><span class="p">[</span><span class="s">'cov_demand'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_12m_units</span><span class="p">[</span><span class="s">'std_demand'</span><span class="p">]</span> <span class="o">/</span> <span class="n">df_12m_units</span><span class="p">[</span><span class="s">'avg_demand'</span><span class="p">]</span>
+</code></pre></div></div>
+
+<p>Once you’ve calculated the Coefficient of Variation in monthly product demand, it’s worth printing the <code class="language-plaintext highlighter-rouge">head()</code> and <code class="language-plaintext highlighter-rouge">tail()</code> of your dataframe to examine the most and least variable products in your inventory. You’ll notice that the set below all have a 3.46 value for their <code class="language-plaintext highlighter-rouge">cov_demand</code>, which is because they all sold in just one month in the 12 within the dataset.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_12m_units</span><span class="p">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s">'cov_demand'</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="bp">False</span><span class="p">).</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+    
+    .dataframe thead th {
+        text-align: right;
+    }
+
+</style>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>month</th>
+      <th>sku</th>
+      <th>m1</th>
+      <th>m2</th>
+      <th>m3</th>
+      <th>m4</th>
+      <th>m5</th>
+      <th>m6</th>
+      <th>m7</th>
+      <th>m8</th>
+      <th>m9</th>
+      <th>m10</th>
+      <th>m11</th>
+      <th>m12</th>
+      <th>cov_demand</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>3892</th>
+      <td>SKU1</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>11.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>3.464102</td>
+    </tr>
+    <tr>
+      <th>5313</th>
+      <td>SKU2</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>19.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>3.464102</td>
+    </tr>
+    <tr>
+      <th>3404</th>
+      <td>SKU3</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>17.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>3.464102</td>
+    </tr>
+    <tr>
+      <th>4961</th>
+      <td>SKU4</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>19.0</td>
+      <td>0.0</td>
+      <td>3.464102</td>
+    </tr>
+    <tr>
+      <th>5356</th>
+      <td>SKU5</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>3.464102</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_12m_units</span><span class="p">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s">'cov_demand'</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="bp">True</span><span class="p">).</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+    
+    .dataframe thead th {
+        text-align: right;
+    }
+
+</style>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>month</th>
+      <th>sku</th>
+      <th>m1</th>
+      <th>m2</th>
+      <th>m3</th>
+      <th>m4</th>
+      <th>m5</th>
+      <th>m6</th>
+      <th>m7</th>
+      <th>m8</th>
+      <th>m9</th>
+      <th>m10</th>
+      <th>m11</th>
+      <th>m12</th>
+      <th>cov_demand</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>95</th>
+      <td>SKU100</td>
+      <td>19.0</td>
+      <td>28.0</td>
+      <td>29.0</td>
+      <td>35.0</td>
+      <td>35.0</td>
+      <td>37.0</td>
+      <td>33.0</td>
+      <td>29.0</td>
+      <td>26.0</td>
+      <td>18.0</td>
+      <td>17.0</td>
+      <td>24.0</td>
+      <td>0.251218</td>
+    </tr>
+    <tr>
+      <th>4135</th>
+      <td>SKU101</td>
+      <td>8.0</td>
+      <td>7.0</td>
+      <td>9.0</td>
+      <td>6.0</td>
+      <td>9.0</td>
+      <td>5.0</td>
+      <td>7.0</td>
+      <td>6.0</td>
+      <td>5.0</td>
+      <td>4.0</td>
+      <td>6.0</td>
+      <td>5.0</td>
+      <td>0.252679</td>
+    </tr>
+    <tr>
+      <th>2848</th>
+      <td>SKU102</td>
+      <td>37.0</td>
+      <td>32.0</td>
+      <td>28.0</td>
+      <td>35.0</td>
+      <td>33.0</td>
+      <td>20.0</td>
+      <td>30.0</td>
+      <td>22.0</td>
+      <td>12.0</td>
+      <td>33.0</td>
+      <td>33.0</td>
+      <td>27.0</td>
+      <td>0.254565</td>
+    </tr>
+    <tr>
+      <th>3925</th>
+      <td>SKU103</td>
+      <td>17.0</td>
+      <td>22.0</td>
+      <td>18.0</td>
+      <td>29.0</td>
+      <td>16.0</td>
+      <td>23.0</td>
+      <td>20.0</td>
+      <td>13.0</td>
+      <td>14.0</td>
+      <td>19.0</td>
+      <td>12.0</td>
+      <td>16.0</td>
+      <td>0.262395</td>
+    </tr>
+    <tr>
+      <th>2954</th>
+      <td>SKU104</td>
+      <td>10.0</td>
+      <td>7.0</td>
+      <td>5.0</td>
+      <td>9.0</td>
+      <td>8.0</td>
+      <td>9.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>6.0</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>7.0</td>
+      <td>0.263513</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p>The <code class="language-plaintext highlighter-rouge">min()</code>, <code class="language-plaintext highlighter-rouge">mean()</code>, and <code class="language-plaintext highlighter-rouge">max()</code> values show that the lowest CV is 0.25, the highest is 3.46, and the overall mean is 1.54. That means this dataset includes lots of products with fluctuating or seasonal demand, which is going to make things much harder for procurement staff to keep in check.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_12m_units</span><span class="p">[</span><span class="s">'cov_demand'</span><span class="p">].</span><span class="nb">min</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0.25121791989373
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_12m_units</span><span class="p">[</span><span class="s">'cov_demand'</span><span class="p">].</span><span class="n">mean</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1.5455514561139476
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_12m_units</span><span class="p">[</span><span class="s">'cov_demand'</span><span class="p">].</span><span class="nb">max</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>3.464101615137755
+</code></pre></div></div>
+
+<p>Here’s the spread of CV across the product range. Given that items with a CV over 1 are much harder to predict due to the fluctuations in demand, this particularly inventory could be a relatively challenging one to keep in good shape, unless the company held expensive levels of buffer inventory.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="p">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">df_12m_units</span><span class="p">[</span><span class="s">'cov_demand'</span><span class="p">]).</span><span class="n">set_title</span><span class="p">(</span><span class="s">"Coefficient of Variation"</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><img src="https://d33wubrfki0l68.cloudfront.net/f4211a561ec03bcb03ffb16d34d32c321de2304f/e138f/assets/images/posts/xyz_output_48_0.png" alt="png" /></p>
+
+<h4 id="assign-xyz-classes">Assign XYZ classes</h4>
+
+<p>As with ABC inventory analysis, you’re free to select your own parameters for the designation of SKUs into the XYZ classes. However, the most common approach is to use the Coefficient of Variation to guide you. Items with a CV of 0.5 or lower are very predictable and have stable sales all year round, so these go in Class X. Items with a CV of 0.5 to 1.0 are less predictable and harder to manage, so these go in Class Y. Finally, everything with a CV over 1 goes in Class Z, as it’s much harder to forecast and subject to fluctuations throughout the year, often because it only sells sporadically.</p>
+
+<p>We’ll create a function to take the <code class="language-plaintext highlighter-rouge">cov_demand</code> value from our dataframe and then assign the relevant Class based on the Coefficient of Variation XYZ rules we defined above. If you use <code class="language-plaintext highlighter-rouge">value_counts()</code> you’ll get a quick summary of the numbers of SKUs in each class. As we can see from the above graph, we’ve only got 236 in the highly predictable Class X, plus 1512 in the less predictable Class Y, while we have a hard to manage 3609 in Class Z.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">xyz_classify_product</span><span class="p">(</span><span class="n">cov</span><span class="p">):</span>
+    <span class="s">"""Apply an XYZ classification to each product based on 
+    its coefficient of variation in order quantity.
+
+    :param cov: Coefficient of variation in order quantity for SKU
+    :return: XYZ inventory classification class
+    """</span>
+
+    <span class="k">if</span> <span class="n">cov</span> <span class="o">&lt;=</span> <span class="mf">0.5</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">'X'</span>
+    <span class="k">elif</span> <span class="n">cov</span> <span class="o">&gt;</span> <span class="mf">0.5</span> <span class="ow">and</span> <span class="n">cov</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">'Y'</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">'Z'</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_12m_units</span><span class="p">[</span><span class="s">'xyz_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_12m_units</span><span class="p">[</span><span class="s">'cov_demand'</span><span class="p">].</span><span class="nb">apply</span><span class="p">(</span><span class="n">xyz_classify_product</span><span class="p">)</span>
+<span class="n">df_12m_units</span><span class="p">.</span><span class="n">xyz_class</span><span class="p">.</span><span class="n">value_counts</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Z    3609
+Y    1512
+X     236
+Name: xyz_class, dtype: int64
+</code></pre></div></div>
+
+<h4 id="examine-the-xyz-classes">Examine the XYZ classes</h4>
+
+<p>To take a look at the distribution of the XYZ classes we can print out our dataframe and then run an aggregation to calculate some summary statistics. Most of the SKUs that are easy to predict have relatively low demand based on the number of units. It’s those in Classes Y and Z which sell in the highest volumes.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_12m_units</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+    
+    .dataframe thead th {
+        text-align: right;
+    }
+
+</style>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>month</th>
+      <th>sku</th>
+      <th>m1</th>
+      <th>m2</th>
+      <th>m3</th>
+      <th>m4</th>
+      <th>m5</th>
+      <th>m6</th>
+      <th>m7</th>
+      <th>m8</th>
+      <th>std_demand</th>
+      <th>total_demand</th>
+      <th>avg_demand</th>
+      <th>cov_demand</th>
+      <th>xyz_class</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>SKU1</td>
+      <td>5.0</td>
+      <td>3.0</td>
+      <td>9.0</td>
+      <td>6.0</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>2.0</td>
+      <td>2.806918</td>
+      <td>44.0</td>
+      <td>3.666667</td>
+      <td>0.765523</td>
+      <td>Y</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>SKU2</td>
+      <td>11.0</td>
+      <td>6.0</td>
+      <td>12.0</td>
+      <td>29.0</td>
+      <td>25.0</td>
+      <td>19.0</td>
+      <td>5.0</td>
+      <td>8.0</td>
+      <td>9.488031</td>
+      <td>123.0</td>
+      <td>10.250000</td>
+      <td>0.925662</td>
+      <td>Y</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>SKU3</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.866025</td>
+      <td>3.0</td>
+      <td>0.250000</td>
+      <td>3.464102</td>
+      <td>Z</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>SKU4</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>3.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>5.0</td>
+      <td>4.0</td>
+      <td>1.825742</td>
+      <td>20.0</td>
+      <td>1.666667</td>
+      <td>1.095445</td>
+      <td>Z</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>SKU6</td>
+      <td>6.0</td>
+      <td>3.0</td>
+      <td>12.0</td>
+      <td>18.0</td>
+      <td>38.0</td>
+      <td>5.0</td>
+      <td>15.0</td>
+      <td>15.0</td>
+      <td>10.255449</td>
+      <td>131.0</td>
+      <td>10.916667</td>
+      <td>0.939430</td>
+      <td>Y</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_12m_units</span><span class="p">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">'xyz_class'</span><span class="p">).</span><span class="n">agg</span><span class="p">(</span>
+    <span class="n">total_skus</span><span class="o">=</span><span class="p">(</span><span class="s">'sku'</span><span class="p">,</span> <span class="s">'nunique'</span><span class="p">),</span>
+    <span class="n">total_demand</span><span class="o">=</span><span class="p">(</span><span class="s">'total_demand'</span><span class="p">,</span> <span class="s">'sum'</span><span class="p">),</span>    
+    <span class="n">std_demand</span><span class="o">=</span><span class="p">(</span><span class="s">'std_demand'</span><span class="p">,</span> <span class="s">'mean'</span><span class="p">),</span>      
+    <span class="n">avg_demand</span><span class="o">=</span><span class="p">(</span><span class="s">'avg_demand'</span><span class="p">,</span> <span class="s">'mean'</span><span class="p">),</span>
+    <span class="n">avg_cov_demand</span><span class="o">=</span><span class="p">(</span><span class="s">'cov_demand'</span><span class="p">,</span> <span class="s">'mean'</span><span class="p">),</span>
+<span class="p">)</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+    
+    .dataframe thead th {
+        text-align: right;
+    }
+
+</style>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>total_skus</th>
+      <th>total_demand</th>
+      <th>std_demand</th>
+      <th>avg_demand</th>
+      <th>avg_cov_demand</th>
+    </tr>
+    <tr>
+      <th>xyz_class</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>X</th>
+      <td>236</td>
+      <td>30144.0</td>
+      <td>4.271093</td>
+      <td>10.644068</td>
+      <td>0.418543</td>
+    </tr>
+    <tr>
+      <th>Y</th>
+      <td>1512</td>
+      <td>166133.0</td>
+      <td>7.494467</td>
+      <td>9.156360</td>
+      <td>0.781056</td>
+    </tr>
+    <tr>
+      <th>Z</th>
+      <td>3609</td>
+      <td>144532.0</td>
+      <td>4.354399</td>
+      <td>3.337305</td>
+      <td>1.939536</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h4 id="plot-the-xyz-data">Plot the XYZ data</h4>
+
+<p>To plot the XYZ data and understand how each of the Classes changes in demand across the year, we need to reshape our data again. We’ll create a new dataframe called <code class="language-plaintext highlighter-rouge">df_monthly</code> and will use a <code class="language-plaintext highlighter-rouge">groupby()</code> function to group products by their <code class="language-plaintext highlighter-rouge">xyz_class</code> and then sum the revenue by month.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_monthly</span> <span class="o">=</span> <span class="n">df_12m_units</span><span class="p">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">'xyz_class'</span><span class="p">).</span><span class="n">agg</span><span class="p">(</span>
+    <span class="n">m1</span><span class="o">=</span><span class="p">(</span><span class="s">'m1'</span><span class="p">,</span> <span class="s">'sum'</span><span class="p">),</span>
+    <span class="n">m2</span><span class="o">=</span><span class="p">(</span><span class="s">'m2'</span><span class="p">,</span> <span class="s">'sum'</span><span class="p">),</span>
+    <span class="n">m3</span><span class="o">=</span><span class="p">(</span><span class="s">'m3'</span><span class="p">,</span> <span class="s">'sum'</span><span class="p">),</span>
+    <span class="n">m4</span><span class="o">=</span><span class="p">(</span><span class="s">'m4'</span><span class="p">,</span> <span class="s">'sum'</span><span class="p">),</span>
+    <span class="n">m5</span><span class="o">=</span><span class="p">(</span><span class="s">'m5'</span><span class="p">,</span> <span class="s">'sum'</span><span class="p">),</span>
+    <span class="n">m6</span><span class="o">=</span><span class="p">(</span><span class="s">'m6'</span><span class="p">,</span> <span class="s">'sum'</span><span class="p">),</span>
+    <span class="n">m7</span><span class="o">=</span><span class="p">(</span><span class="s">'m7'</span><span class="p">,</span> <span class="s">'sum'</span><span class="p">),</span>
+    <span class="n">m8</span><span class="o">=</span><span class="p">(</span><span class="s">'m8'</span><span class="p">,</span> <span class="s">'sum'</span><span class="p">),</span>
+    <span class="n">m9</span><span class="o">=</span><span class="p">(</span><span class="s">'m9'</span><span class="p">,</span> <span class="s">'sum'</span><span class="p">),</span>
+    <span class="n">m10</span><span class="o">=</span><span class="p">(</span><span class="s">'m10'</span><span class="p">,</span> <span class="s">'sum'</span><span class="p">),</span>
+    <span class="n">m11</span><span class="o">=</span><span class="p">(</span><span class="s">'m11'</span><span class="p">,</span> <span class="s">'sum'</span><span class="p">),</span>
+    <span class="n">m12</span><span class="o">=</span><span class="p">(</span><span class="s">'m12'</span><span class="p">,</span> <span class="s">'sum'</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">df_monthly</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+    
+    .dataframe thead th {
+        text-align: right;
+    }
+
+</style>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>m1</th>
+      <th>m2</th>
+      <th>m3</th>
+      <th>m4</th>
+      <th>m5</th>
+      <th>m6</th>
+      <th>m7</th>
+      <th>m8</th>
+      <th>m9</th>
+      <th>m10</th>
+      <th>m11</th>
+      <th>m12</th>
+    </tr>
+    <tr>
+      <th>xyz_class</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>X</th>
+      <td>2495.0</td>
+      <td>2388.0</td>
+      <td>2718.0</td>
+      <td>2922.0</td>
+      <td>3125.0</td>
+      <td>2777.0</td>
+      <td>2402.0</td>
+      <td>2432.0</td>
+      <td>2153.0</td>
+      <td>1993.0</td>
+      <td>2470.0</td>
+      <td>2269.0</td>
+    </tr>
+    <tr>
+      <th>Y</th>
+      <td>6218.0</td>
+      <td>6886.0</td>
+      <td>12582.0</td>
+      <td>23269.0</td>
+      <td>26799.0</td>
+      <td>20835.0</td>
+      <td>16899.0</td>
+      <td>18408.0</td>
+      <td>17052.0</td>
+      <td>6024.0</td>
+      <td>6039.0</td>
+      <td>5122.0</td>
+    </tr>
+    <tr>
+      <th>Z</th>
+      <td>2929.0</td>
+      <td>3241.0</td>
+      <td>8897.0</td>
+      <td>24075.0</td>
+      <td>32435.0</td>
+      <td>20367.0</td>
+      <td>14650.0</td>
+      <td>14836.0</td>
+      <td>13270.0</td>
+      <td>4108.0</td>
+      <td>3331.0</td>
+      <td>2393.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p>For plotting, we need to convert the data from wide format to long format, so we’ll use the <code class="language-plaintext highlighter-rouge">unstack()</code> function to create a long dataframe, then we’ll reset the index and rename the columns to match the underlying data.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_monthly_unstacked</span> <span class="o">=</span> <span class="n">df_monthly</span><span class="p">.</span><span class="n">unstack</span><span class="p">(</span><span class="s">'xyz_class'</span><span class="p">).</span><span class="n">to_frame</span><span class="p">()</span>
+<span class="n">df_monthly_unstacked</span> <span class="o">=</span> <span class="n">df_monthly_unstacked</span><span class="p">.</span><span class="n">reset_index</span><span class="p">().</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s">'level_0'</span><span class="p">:</span> <span class="s">'month'</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="s">'demand'</span><span class="p">})</span>
+<span class="n">df_monthly_unstacked</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+    
+    .dataframe thead th {
+        text-align: right;
+    }
+
+</style>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>month</th>
+      <th>xyz_class</th>
+      <th>demand</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>m1</td>
+      <td>X</td>
+      <td>2495.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>m1</td>
+      <td>Y</td>
+      <td>6218.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>m1</td>
+      <td>Z</td>
+      <td>2929.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>m2</td>
+      <td>X</td>
+      <td>2388.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>m2</td>
+      <td>Y</td>
+      <td>6886.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p>Plotting the Class X data shows that the demand for these products is relatively steady throughout the year. In less seasonal businesses where the SKUs sell at similar rates all year, we’d expect to see almost no variation, but the changes here show that this retailer does have more seasonal SKUs than most.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="p">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">"month"</span><span class="p">,</span> 
+                 <span class="n">y</span><span class="o">=</span><span class="s">"demand"</span><span class="p">,</span> 
+                 <span class="n">data</span><span class="o">=</span><span class="n">df_monthly_unstacked</span><span class="p">[</span><span class="n">df_monthly_unstacked</span><span class="p">[</span><span class="s">'xyz_class'</span><span class="p">]</span><span class="o">==</span><span class="s">'X'</span><span class="p">],</span>
+                 <span class="n">palette</span><span class="o">=</span><span class="s">"Blues_d"</span><span class="p">)</span>\
+                 <span class="p">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">"X class demand by month"</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><img src="https://d33wubrfki0l68.cloudfront.net/c5cf5d500cefbcbc253fd0b04edc426b69bcbb44/c6869/assets/images/posts/xyz_output_60_0.png" alt="png" /></p>
+
+<p>The Class Y data shows why these SKUs are harder to control. The warmer months see some big changes in demand and then sales of these SKUs drop away significantly as soon as autumn arrives.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="p">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">"month"</span><span class="p">,</span> 
+                 <span class="n">y</span><span class="o">=</span><span class="s">"demand"</span><span class="p">,</span> 
+                 <span class="n">data</span><span class="o">=</span><span class="n">df_monthly_unstacked</span><span class="p">[</span><span class="n">df_monthly_unstacked</span><span class="p">[</span><span class="s">'xyz_class'</span><span class="p">]</span><span class="o">==</span><span class="s">'Y'</span><span class="p">],</span>
+                 <span class="n">palette</span><span class="o">=</span><span class="s">"Blues_d"</span><span class="p">)</span>\
+                 <span class="p">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">"Y class demand by month"</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><img src="https://d33wubrfki0l68.cloudfront.net/80c77bb5faff955e3c6ebfa7bf973f1c454e0348/ff4ad/assets/images/posts/xyz_output_62_0.png" alt="png" /></p>
+
+<p>The Class Z SKUs are the least predictable of all. They’re relatively similar in pattern to Class Y, but the impact is slightly more dramatic because some of the SKUs only sell during the summer and some only sell once per year.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="p">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">"month"</span><span class="p">,</span> 
+                 <span class="n">y</span><span class="o">=</span><span class="s">"demand"</span><span class="p">,</span> 
+                 <span class="n">data</span><span class="o">=</span><span class="n">df_monthly_unstacked</span><span class="p">[</span><span class="n">df_monthly_unstacked</span><span class="p">[</span><span class="s">'xyz_class'</span><span class="p">]</span><span class="o">==</span><span class="s">'Z'</span><span class="p">],</span>
+                 <span class="n">palette</span><span class="o">=</span><span class="s">"Blues_d"</span><span class="p">)</span>\
+                 <span class="p">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">"Z class demand by month"</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><img src="https://d33wubrfki0l68.cloudfront.net/eee668f3a2a6ff575726260dbcd00792d4d30561/b08cc/assets/images/posts/xyz_output_64_0.png" alt="png" /></p>
+
+<p>Here they all are side by side. The really interesting thing here, when they’re all shown on the same scale, is that not only are the hard to predict Class Y and Class Z SKUs seasonal over the summer months, the spike in demand they generate is massive.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="p">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">"month"</span><span class="p">,</span> 
+                 <span class="n">y</span><span class="o">=</span><span class="s">"demand"</span><span class="p">,</span> 
+                 <span class="n">hue</span><span class="o">=</span><span class="s">"xyz_class"</span><span class="p">,</span> 
+                 <span class="n">data</span><span class="o">=</span><span class="n">df_monthly_unstacked</span><span class="p">,</span>
+                 <span class="n">palette</span><span class="o">=</span><span class="s">"Blues_d"</span><span class="p">)</span>\
+                <span class="p">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">"XYZ demand by month"</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><img src="https://d33wubrfki0l68.cloudfront.net/e9b6a5e1bf9835f2adf80eceb078687b8fd84480/d366c/assets/images/posts/xyz_output_66_0.png" alt="png" /></p>
+
+<h4 id="abc-inventory-analysis">ABC inventory analysis</h4>
+
+<p>Since XYZ analysis only looks at the unit volume demand, we next need to perform an ABC inventory analysis to determine the revenue impact each provides. We’ll re-use the 12 month dataframe we created earlier and will then run an aggregation to calculate the revenue metrics for each SKU.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_skus</span> <span class="o">=</span> <span class="n">df_12m</span><span class="p">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">'sku'</span><span class="p">).</span><span class="n">agg</span><span class="p">(</span>
+    <span class="n">unique_purchases</span><span class="o">=</span><span class="p">(</span><span class="s">'sku'</span><span class="p">,</span> <span class="s">'nunique'</span><span class="p">),</span>
+    <span class="n">total_units</span><span class="o">=</span><span class="p">(</span><span class="s">'quantity'</span><span class="p">,</span> <span class="s">'sum'</span><span class="p">),</span>
+    <span class="n">total_revenue</span><span class="o">=</span><span class="p">(</span><span class="s">'revenue'</span><span class="p">,</span> <span class="s">'sum'</span><span class="p">),</span>
+<span class="p">).</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s">'total_revenue'</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="bp">False</span><span class="p">).</span><span class="n">reset_index</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_skus</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+    
+    .dataframe thead th {
+        text-align: right;
+    }
+
+</style>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sku</th>
+      <th>unique_purchases</th>
+      <th>total_units</th>
+      <th>total_revenue</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>SKU1</td>
+      <td>1</td>
+      <td>2526</td>
+      <td>125478.21</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>SKU2</td>
+      <td>1</td>
+      <td>1059</td>
+      <td>105242.81</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>SKU3</td>
+      <td>1</td>
+      <td>2107</td>
+      <td>91694.40</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>SKU4</td>
+      <td>1</td>
+      <td>562</td>
+      <td>67302.45</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>SKU5</td>
+      <td>1</td>
+      <td>707</td>
+      <td>60823.65</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p>To calculate ABC classes we need to know the total revenue generated by all SKUs and the cumulative percentage revenue contribution generated by each SKU. It’s vital that they’re sorted in descending order of the total revenue they generated in order for this to work, as we did above. We can use the <code class="language-plaintext highlighter-rouge">cumsum()</code> function to calculate the cumulative sum of revenue and then calculate the running percentage of revenue and store it in the dataframe.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_skus</span><span class="p">[</span><span class="s">'revenue_cumsum'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_skus</span><span class="p">[</span><span class="s">'total_revenue'</span><span class="p">].</span><span class="n">cumsum</span><span class="p">()</span>
+<span class="n">df_skus</span><span class="p">[</span><span class="s">'revenue_total'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_skus</span><span class="p">[</span><span class="s">'total_revenue'</span><span class="p">].</span><span class="nb">sum</span><span class="p">()</span>
+<span class="n">df_skus</span><span class="p">[</span><span class="s">'revenue_running_percentage'</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df_skus</span><span class="p">[</span><span class="s">'revenue_cumsum'</span><span class="p">]</span> <span class="o">/</span> <span class="n">df_skus</span><span class="p">[</span><span class="s">'revenue_total'</span><span class="p">])</span> <span class="o">*</span> <span class="mi">100</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_skus</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+    
+    .dataframe thead th {
+        text-align: right;
+    }
+
+</style>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sku</th>
+      <th>unique_purchases</th>
+      <th>total_units</th>
+      <th>total_revenue</th>
+      <th>revenue_cumsum</th>
+      <th>revenue_total</th>
+      <th>revenue_running_percentage</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>SKU1</td>
+      <td>1</td>
+      <td>2526</td>
+      <td>125478.21</td>
+      <td>125478.21</td>
+      <td>8731132.47</td>
+      <td>1.437136</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>SKU2</td>
+      <td>1</td>
+      <td>1059</td>
+      <td>105242.81</td>
+      <td>230721.02</td>
+      <td>8731132.47</td>
+      <td>2.642510</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>SKU3</td>
+      <td>1</td>
+      <td>2107</td>
+      <td>91694.40</td>
+      <td>322415.42</td>
+      <td>8731132.47</td>
+      <td>3.692710</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>SKU4</td>
+      <td>1</td>
+      <td>562</td>
+      <td>67302.45</td>
+      <td>389717.87</td>
+      <td>8731132.47</td>
+      <td>4.463543</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>SKU5</td>
+      <td>1</td>
+      <td>707</td>
+      <td>60823.65</td>
+      <td>450541.52</td>
+      <td>8731132.47</td>
+      <td>5.160173</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p>As with the XYZ classification, we’ll create a function to assign each product to the relevant Class based on its contribution to the percentage revenue. You can use whatever split best suits your data. I’ve assigned the SKUs that generate the top 80% of the revenue to Class A, the next 10% of revenue generators to Class B, and the rest to Class C.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">abc_classify_product</span><span class="p">(</span><span class="n">percentage</span><span class="p">):</span>
+    <span class="s">"""Apply an ABC classification to each product based on 
+    its ranked percentage revenue contribution. Any split 
+    can be used to suit your data. 
+
+    :param percentage: Running percentage of revenue contributed
+    :return: ABC inventory classification
+    """</span>
+
+    <span class="k">if</span> <span class="n">percentage</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">percentage</span> <span class="o">&lt;=</span> <span class="mi">80</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">'A'</span>
+    <span class="k">elif</span> <span class="n">percentage</span> <span class="o">&gt;</span> <span class="mi">80</span> <span class="ow">and</span> <span class="n">percentage</span> <span class="o">&lt;=</span> <span class="mi">90</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">'B'</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">'C'</span>
+</code></pre></div></div>
+
+<p>Next, apply the <code class="language-plaintext highlighter-rouge">abc_classify_product()</code> function above and assign the value to the dataframe. It’s also useful to calculate the product sales rank at the same time, which you can do using the <code class="language-plaintext highlighter-rouge">rank()</code> function.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_skus</span><span class="p">[</span><span class="s">'abc_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_skus</span><span class="p">[</span><span class="s">'revenue_running_percentage'</span><span class="p">].</span><span class="nb">apply</span><span class="p">(</span><span class="n">abc_classify_product</span><span class="p">)</span>
+<span class="n">df_skus</span><span class="p">[</span><span class="s">'abc_rank'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_skus</span><span class="p">[</span><span class="s">'revenue_running_percentage'</span><span class="p">].</span><span class="n">rank</span><span class="p">().</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="n">df_skus</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+    
+    .dataframe thead th {
+        text-align: right;
+    }
+
+</style>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sku</th>
+      <th>total_revenue</th>
+      <th>revenue_cumsum</th>
+      <th>revenue_total</th>
+      <th>revenue_running_percentage</th>
+      <th>abc_class</th>
+      <th>abc_rank</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>SKU1</td>
+      <td>125478.21</td>
+      <td>125478.21</td>
+      <td>8731132.47</td>
+      <td>1.437136</td>
+      <td>A</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>SKU2</td>
+      <td>105242.81</td>
+      <td>230721.02</td>
+      <td>8731132.47</td>
+      <td>2.642510</td>
+      <td>A</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>SKU3</td>
+      <td>91694.40</td>
+      <td>322415.42</td>
+      <td>8731132.47</td>
+      <td>3.692710</td>
+      <td>A</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>SKU4</td>
+      <td>67302.45</td>
+      <td>389717.87</td>
+      <td>8731132.47</td>
+      <td>4.463543</td>
+      <td>A</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>SKU5</td>
+      <td>60823.65</td>
+      <td>450541.52</td>
+      <td>8731132.47</td>
+      <td>5.160173</td>
+      <td>A</td>
+      <td>5</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p>If we now examine the stats for each of the Classes, we see that we’ve got 1171 in Class A generating 80% of our revenue. There are 738 in Class B, generating the next 10% and then a massive 3448 in Class C, which generate the bottom 10% of sales. Clearly, some management effort could be saved by focusing mostly on the A and B SKUs, instead of getting bogged down on the much slower selling Class C SKUs.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_abc</span> <span class="o">=</span> <span class="n">df_skus</span><span class="p">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">'abc_class'</span><span class="p">).</span><span class="n">agg</span><span class="p">(</span>
+    <span class="n">total_skus</span><span class="o">=</span><span class="p">(</span><span class="s">'sku'</span><span class="p">,</span> <span class="s">'nunique'</span><span class="p">),</span>
+    <span class="n">total_units</span><span class="o">=</span><span class="p">(</span><span class="s">'total_units'</span><span class="p">,</span> <span class="nb">sum</span><span class="p">),</span>
+    <span class="n">total_revenue</span><span class="o">=</span><span class="p">(</span><span class="s">'total_revenue'</span><span class="p">,</span> <span class="nb">sum</span><span class="p">),</span>
+<span class="p">).</span><span class="n">reset_index</span><span class="p">()</span>
+
+<span class="n">df_abc</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+    
+    .dataframe thead th {
+        text-align: right;
+    }
+
+</style>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>abc_class</th>
+      <th>total_skus</th>
+      <th>total_units</th>
+      <th>total_revenue</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>A</td>
+      <td>1171</td>
+      <td>208560</td>
+      <td>6983670.13</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>B</td>
+      <td>738</td>
+      <td>44042</td>
+      <td>873627.71</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>C</td>
+      <td>3448</td>
+      <td>88207</td>
+      <td>873834.63</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p>Here’s how the ABC Class data looks in terms of the revenue generated per class - you can see the 80/10/10 split we used.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="p">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">"abc_class"</span><span class="p">,</span> 
+                 <span class="n">y</span><span class="o">=</span><span class="s">"total_revenue"</span><span class="p">,</span> 
+                 <span class="n">data</span><span class="o">=</span><span class="n">df_abc</span><span class="p">,</span>
+                 <span class="n">palette</span><span class="o">=</span><span class="s">"Blues_d"</span><span class="p">)</span>\
+                <span class="p">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">"Revenue by ABC class"</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><img src="https://d33wubrfki0l68.cloudfront.net/ea41d9365767b93925ea2bdbab3ee7a438286f44/a7aa5/assets/images/posts/xyz_output_80_0.png" alt="png" /></p>
+
+<p>As you can see, there’s a shedload of SKUs in Class C, which only generate 10% of the company’s total revenue.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="p">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">"abc_class"</span><span class="p">,</span> 
+                 <span class="n">y</span><span class="o">=</span><span class="s">"total_skus"</span><span class="p">,</span> 
+                 <span class="n">data</span><span class="o">=</span><span class="n">df_abc</span><span class="p">,</span>
+                 <span class="n">palette</span><span class="o">=</span><span class="s">"Blues_d"</span><span class="p">)</span>\
+                <span class="p">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">"SKUs by ABC class"</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><img src="https://d33wubrfki0l68.cloudfront.net/ec074250d61020e8bba25fae835f2bed3168e7ca/90208/assets/images/posts/xyz_output_82_0.png" alt="png" /></p>
+
+<p>In terms of the quantities of units sold, there are obviously lots in Class A, as they made up 80% of the revenue, but there are also loads in Class C, which suggests there are lots of cheap, seasonal items in here, or things that only sell sporadically.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="p">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">"abc_class"</span><span class="p">,</span> 
+                 <span class="n">y</span><span class="o">=</span><span class="s">"total_units"</span><span class="p">,</span> 
+                 <span class="n">data</span><span class="o">=</span><span class="n">df_abc</span><span class="p">,</span>
+                 <span class="n">palette</span><span class="o">=</span><span class="s">"Blues_d"</span><span class="p">)</span>\
+                <span class="p">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">"Quantity by ABC class"</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><img src="https://d33wubrfki0l68.cloudfront.net/232a5628b31b76d5d73aadb98e61e520889a4364/641ff/assets/images/posts/xyz_output_84_0.png" alt="png" /></p>
+
+<h2 id="abc-xyz-inventory-analysis">ABC-XYZ inventory analysis</h2>
+
+<p>The final step is to bring together our XYZ inventory management data with our ABC inventory management data. We’ll select the key metrics we want to keep from our ABC analysis and create a new dataframe, then we’ll join that to the XYZ analysis data.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_abc</span> <span class="o">=</span> <span class="n">df_skus</span><span class="p">[[</span><span class="s">'sku'</span><span class="p">,</span><span class="s">'abc_class'</span><span class="p">,</span><span class="s">'abc_rank'</span><span class="p">,</span><span class="s">'total_revenue'</span><span class="p">]]</span>
+<span class="n">df_xyz</span> <span class="o">=</span> <span class="n">df_12m_units</span><span class="p">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">df_abc_xyz</span> <span class="o">=</span> <span class="n">df_abc</span><span class="p">.</span><span class="n">merge</span><span class="p">(</span><span class="n">df_xyz</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s">'sku'</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s">'left'</span><span class="p">)</span>
+<span class="n">df_abc_xyz</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+    
+    .dataframe thead th {
+        text-align: right;
+    }
+
+</style>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sku</th>
+      <th>abc_class</th>
+      <th>abc_rank</th>
+      <th>total_revenue</th>
+      <th>std_demand</th>
+      <th>total_demand</th>
+      <th>avg_demand</th>
+      <th>cov_demand</th>
+      <th>xyz_class</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>SKU1</td>
+      <td>A</td>
+      <td>1</td>
+      <td>125478.21</td>
+
+      <td>180.563512</td>
+      <td>2526.0</td>
+      <td>210.500000</td>
+      <td>0.857784</td>
+      <td>Y</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>SKU2</td>
+      <td>A</td>
+      <td>2</td>
+      <td>105242.81</td>
+
+      <td>78.563379</td>
+      <td>1059.0</td>
+      <td>88.250000</td>
+      <td>0.890237</td>
+      <td>Y</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>SKU3</td>
+      <td>A</td>
+      <td>3</td>
+      <td>91694.40</td>
+
+      <td>143.161357</td>
+      <td>2107.0</td>
+      <td>175.583333</td>
+      <td>0.815347</td>
+      <td>Y</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>SKU4</td>
+      <td>A</td>
+      <td>4</td>
+      <td>67302.45</td>
+
+      <td>32.078975</td>
+      <td>562.0</td>
+      <td>46.833333</td>
+      <td>0.684960</td>
+      <td>Y</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>SKU5</td>
+      <td>A</td>
+      <td>5</td>
+      <td>60823.65</td>
+
+      <td>49.522187</td>
+      <td>707.0</td>
+      <td>58.916667</td>
+      <td>0.840546</td>
+      <td>Y</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 21 columns</p>
+</div>
+
+<h4 id="creating-the-abc-xyz-class">Creating the ABC-XYZ class</h4>
+
+<p>Now we’ve got the data all in one place, we can create the ABC-XYZ class designations by concatenating the string value of the <code class="language-plaintext highlighter-rouge">abc_class</code> to the <code class="language-plaintext highlighter-rouge">xyz_class</code>. We’ll then create a new dataframe of summary statistics by grouping on the new <code class="language-plaintext highlighter-rouge">abc_xyz_class</code> and calculating the number of SKUs, the demand volume, the average demand, and the total revenue by class.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_abc_xyz</span><span class="p">[</span><span class="s">'abc_xyz_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_abc_xyz</span><span class="p">[</span><span class="s">'abc_class'</span><span class="p">].</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="n">df_abc_xyz</span><span class="p">[</span><span class="s">'xyz_class'</span><span class="p">].</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Most of our revenue comes from products in Class AZ. These contribute the top 80% of the revenue but are also seasonal and harder to predict. At the bottom, we’ve got a small group of Class C SKUs which contribute little, but on the plus side are not very variable, so are easier to predict.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_abc_xyz_summary</span> <span class="o">=</span> <span class="n">df_abc_xyz</span><span class="p">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">'abc_xyz_class'</span><span class="p">).</span><span class="n">agg</span><span class="p">(</span>
+    <span class="n">total_skus</span><span class="o">=</span><span class="p">(</span><span class="s">'sku'</span><span class="p">,</span> <span class="s">'nunique'</span><span class="p">),</span>
+    <span class="n">total_demand</span><span class="o">=</span><span class="p">(</span><span class="s">'total_demand'</span><span class="p">,</span> <span class="nb">sum</span><span class="p">),</span>
+    <span class="n">avg_demand</span><span class="o">=</span><span class="p">(</span><span class="s">'avg_demand'</span><span class="p">,</span> <span class="s">'mean'</span><span class="p">),</span>    
+    <span class="n">total_revenue</span><span class="o">=</span><span class="p">(</span><span class="s">'total_revenue'</span><span class="p">,</span> <span class="nb">sum</span><span class="p">),</span>    
+<span class="p">).</span><span class="n">reset_index</span><span class="p">()</span>
+
+<span class="n">df_abc_xyz_summary</span><span class="p">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s">'total_revenue'</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+    
+    .dataframe thead th {
+        text-align: right;
+    }
+
+</style>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>abc_xyz_class</th>
+      <th>total_skus</th>
+      <th>total_demand</th>
+      <th>avg_demand</th>
+      <th>total_revenue</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2</th>
+      <td>AZ</td>
+      <td>709</td>
+      <td>92142.0</td>
+      <td>10.830042</td>
+      <td>3597378.39</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>AY</td>
+      <td>371</td>
+      <td>100443.0</td>
+      <td>22.561321</td>
+      <td>3016842.12</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>BZ</td>
+      <td>470</td>
+      <td>17313.0</td>
+      <td>3.069681</td>
+      <td>559901.76</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>CZ</td>
+      <td>2430</td>
+      <td>35077.0</td>
+      <td>1.202915</td>
+      <td>532094.09</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>AX</td>
+      <td>91</td>
+      <td>15975.0</td>
+      <td>14.629121</td>
+      <td>369449.62</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>CY</td>
+      <td>925</td>
+      <td>45976.0</td>
+      <td>4.141982</td>
+      <td>298143.90</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>BY</td>
+      <td>216</td>
+      <td>19714.0</td>
+      <td>7.605710</td>
+      <td>253923.36</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>BX</td>
+      <td>52</td>
+      <td>7015.0</td>
+      <td>11.241987</td>
+      <td>59802.59</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>CX</td>
+      <td>93</td>
+      <td>7154.0</td>
+      <td>6.410394</td>
+      <td>43596.64</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="p">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">"abc_xyz_class"</span><span class="p">,</span> 
+                 <span class="n">y</span><span class="o">=</span><span class="s">"total_skus"</span><span class="p">,</span> 
+                 <span class="n">data</span><span class="o">=</span><span class="n">df_abc_xyz_summary</span><span class="p">,</span>
+                 <span class="n">palette</span><span class="o">=</span><span class="s">"Blues_d"</span><span class="p">)</span>\
+                <span class="p">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">"SKUs by ABC-XYZ class"</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><img src="https://d33wubrfki0l68.cloudfront.net/95141afc0ffdf4737976b46a83269cc55d161d85/98119/assets/images/posts/xyz_output_91_0.png" alt="png" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="p">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">"abc_xyz_class"</span><span class="p">,</span> 
+                 <span class="n">y</span><span class="o">=</span><span class="s">"total_revenue"</span><span class="p">,</span> 
+                 <span class="n">data</span><span class="o">=</span><span class="n">df_abc_xyz_summary</span><span class="p">,</span> 
+                 <span class="n">palette</span><span class="o">=</span><span class="s">"Blues_d"</span><span class="p">)</span>\
+                <span class="p">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">"Revenue by ABC-XYZ class"</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><img src="https://d33wubrfki0l68.cloudfront.net/c4c324e66145ba18db75cbf525c7cbe6df8ac58d/19a1e/assets/images/posts/xyz_output_92_0.png" alt="png" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="p">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">"abc_xyz_class"</span><span class="p">,</span> 
+                 <span class="n">y</span><span class="o">=</span><span class="s">"total_demand"</span><span class="p">,</span> 
+                 <span class="n">data</span><span class="o">=</span><span class="n">df_abc_xyz_summary</span><span class="p">,</span> 
+                 <span class="n">palette</span><span class="o">=</span><span class="s">"Blues_d"</span><span class="p">)</span>\
+                <span class="p">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">"Demand by ABC-XYZ class"</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><img src="https://d33wubrfki0l68.cloudfront.net/ddb78cb1bbd09fb2874c7ff9436c430db399df15/0125b/assets/images/posts/xyz_output_93_0.png" alt="png" /></p>
+
+<h4 id="understanding-the-abc-xyz-classes">Understanding the ABC XYZ classes</h4>
+<p>By combining the ABC and XYZ data we generate nine distinct classes. The Classes with an A prefix all contribute high amounts of revenue, the B Classes contribute medium revenue and the C Classes contribute low revenue.</p>
+
+<p>Similarly, the X suffixed Classes have steady demand and are easy to forecast and manage. The Y suffixed Classes have variable but predictable demand so are harder to manage than the X Classes, but still easily doable. The Z Classes are the toughest of all. They’re sold sporadically and in varying volumes, so they’re harder to forecast and harder to manage.</p>
+
+<blockquote>
+  <p>Chances are, your operations and procurement team will already understand how to apply ABC XYZ inventory classification, given that it’s the industry standard and is included within major platforms such as SAP.</p>
+</blockquote>
+
+<table class="table">
+    <tr>
+        <td><strong>AX</strong><br />
+            <ul>
+                <li>High value</li>
+                <li>Steady demand</li>
+                <li>Easy to forecast</li>
+                <li>Easy to manage</li>
+            </ul>
+        </td>
+        <td><strong>BX</strong><br />
+            <ul>
+                <li>Medium value</li>
+                <li>Steady demand</li>
+                <li>Easy to forecast</li>
+                <li>Easy to manage</li>
+            </ul>
+        </td>
+        <td><strong>CX</strong><br />
+            <ul>
+                <li>Low value</li>
+                <li>Steady demand</li>
+                <li>Easy to forecast</li>
+                <li>Easy to manage</li>
+            </ul>
+        </td>
+    </tr>    
+    <tr>
+        <td><strong>AY</strong><br />
+            <ul>
+                <li>High value</li>
+                <li>Variable demand</li>
+                <li>Harder to forecast</li>
+                <li>Harder to manage</li>
+            </ul>
+        </td>
+        <td><strong>BY</strong><br />
+            <ul>
+                <li>Medium value</li>
+                <li>Variable demand</li>
+                <li>Harder to forecast</li>
+                <li>Harder to manage</li>
+            </ul>
+        </td>
+        <td><strong>CY</strong><br />
+            <ul>
+                <li>Low value</li>
+                <li>Variable demand</li>
+                <li>Harder to forecast</li>
+                <li>Harder to manage</li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td><strong>AZ</strong><br />
+            <ul>
+                <li>High value</li>
+                <li>Sporadic demand</li>
+                <li>Difficult to forecast</li>
+                <li>Difficult to manage</li>
+            </ul>
+        </td>
+        <td><strong>BZ</strong><br />
+            <ul>
+                <li>Medium value</li>
+                <li>Sporadic demand</li>
+                <li>Difficult to forecast</li>
+                <li>Difficult to manage</li>
+            </ul>
+        </td>
+        <td><strong>CZ</strong><br />
+            <ul>
+                <li>Low value</li>
+                <li>Sporadic demand</li>
+                <li>Difficult to forecast</li>
+                <li>Difficult to manage</li>
+            </ul>
+        </td>
+    </tr>    
+</table>
+
+<h4 id="management-approaches">Management approaches</h4>
+<p>The simplest solution to avoiding stock-outs is to simply hold more stock by increasing your buffer inventory levels. This has many advantages: You’ll lose fewer sales, so AOVs and revenue will be higher; you’ll likely see better <a href="/data-science/a-quick-guide-to-customer-retention">customer retention</a> and higher levels of satisfaction because customers don’t go elsewhere when they see an item is out of stock, and you won’t need to procure expensive emergency replenishment stock and erode your margin.</p>
+
+<p>However, holding higher stocks also has some disadvantages: You’ll need to spend more on stock; you’ll have more capital tied up in stock; you’ll need more space, equipment, and staff to handle the stock; insurance costs will go up with your stock valuation. What’s needed, therefore, is a compromise which sits somewhere in the middle.</p>
+
+<p>The <a href="https://www.cgma.org/resources/tools/cost-transformation-model/abc-xyz-inventory-management.html">Association of International Certified Professional Accountants</a> has some very good information on the practical application of ABC XYZ classifications for procurement managers to follow to maximise the revenue and profit for the business, without tying up loads of capital in stock. It recommends the following approach:</p>
+
+<table class="table">
+    <tr>
+        <td><strong>AX</strong><br />
+            <ul>
+                <li>Automatic replenishment</li>
+                <li>Low buffer, JIT, or consignment transfers</li>
+                <li>Perpetual inventory</li>
+            </ul>
+        </td>
+        <td><strong>BX</strong><br />
+            <ul>
+                <li>Automatic replenishment</li>
+                <li>Periodic counting</li>
+                <li>Low buffer</li>
+            </ul>
+        </td>
+        <td><strong>CX</strong><br />
+            <ul>
+                <li>Automatic replenishment</li>
+                <li>Periodic estimation</li>
+                <li>Low buffer</li>
+            </ul>
+        </td>
+    </tr>    
+    <tr>
+        <td><strong>AY</strong><br />
+            <ul>
+                <li>Semi-automatic replenishment</li>
+                <li>Low buffer</li>
+            </ul>
+        </td>
+        <td><strong>BY</strong><br />
+            <ul>
+                <li>Semi-automatic replenishment</li>
+                <li>Manually adjusted seasonal buffer</li>
+            </ul>
+        </td>
+        <td><strong>CY</strong><br />
+            <ul>
+                <li>Semi-automatic replenishment</li>
+                <li>High buffer</li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td><strong>AZ</strong><br />
+            <ul>
+                <li>Buy to order</li>
+                <li>No buffer</li>
+                <li>Not stocked</li>
+            </ul>
+        </td>
+        <td><strong>BZ</strong><br />
+            <ul>
+                <li>Buy to order</li>
+                <li>No buffer</li>
+                <li>Lead time shown</li>
+                <li>Not stocked</li>                
+            </ul>
+        </td>
+        <td><strong>CZ</strong><br />
+            <ul>
+                <li>Automatic replenishment</li>
+                <li>High buffer</li>
+                <li>Periodic inspection</li>
+            </ul>
+        </td>
+    </tr>    
+</table>
+
+<p>ABC XYZ inventory management is just one of a wide range of commonly used inventory control systems in operations management (including HML, VED, SDF, SOS, GOLF, and FNS), each of which sets out to solve some of the specific issues that can arise with different types of inventory, including the impact of a stock out on production. You can find out more about it in the papers below.</p>
+
+<h4 id="further-reading">Further reading</h4>
+
+<ul>
+  <li>
+    <p>Aktunc, E.A., Basaran, M., Ari, G., Irican, M. and Gungor, S., 2019. Inventory Control Through ABC/XYZ Analysis. In Industrial Engineering in the Big Data Era (pp. 175-187). Springer, Cham.</p>
+  </li>
+  <li>
+    <p>Anonymous, 2020. <a href="https://www.cgma.org/resources/tools/cost-transformation-model/abc-xyz-inventory-management.html">ABC XYZ Inventory Management</a>, Association of International Certified Professional Accountants.</p>
+  </li>
+  <li>
+    <p>Gonzalez, J.L. and González, D., 2010. Analysis of an economic order quantity and reorder point inventory control model for company XYZ.</p>
+  </li>
+  <li>
+    <p>Pandya¹, B. and Thakkar, H., 2016. A review on inventory management control techniques: ABC-XYZ analysis. REST Journal on Emerging trends in Modelling and Manufacturing, 2, p.15.</p>
+  </li>
+</ul>
+
+
+    
+    <p class="summary"><span class="date">Matt Clarke, Friday, March 05, 2021</span></p>
+    
+
+
+
+
+</div>
+        
+
+
+<div class="row post-share-buttons">
+    <div class="col-4 facebook">
+        <a class="post-share-button facebook" title="Share this on Facebook" href="http://www.facebook.com/share.php?u=https://practicaldatascience.co.uk/data-science/how-to-create-an-abc-xyz-inventory-classification-model" rel="nofollow noopener">
+            <i class="fab fa-facebook"></i> <span class="d-md-inline d-none">Facebook</span></a>
+    </div>
+
+    <div class="col-4 twitter">
+        <a class="post-share-button twitter" title="Share this on Twitter" href="http://twitter.com/home?status=https://practicaldatascience.co.uk/data-science/how-to-create-an-abc-xyz-inventory-classification-model" rel="nofollow noopener">
+            <i class="fab fa-twitter"></i> <span class="d-md-inline d-none">Twitter</span></a>
+    </div>
+
+    <div class="col-4 linkedin">
+        <a class="post-share-button linkedin" title="Share this on LinkedIn" href="https://www.linkedin.com/shareArticle?mini=true&url=https://practicaldatascience.co.uk/data-science/how-to-create-an-abc-xyz-inventory-classification-model&title=&summary=&source=" rel="nofollow noopener">
+            <i class="fab fa-linkedin"></i> <span class="d-md-inline d-none">LinkedIn</span></a>
+    </div>
+</div>
+    </div>
+
+        
+        
+
+
+<div class="post-box">
+    <div class="d-flex authorbox align-items-center">
+        <div class="col-lg-2 d-none d-lg-block text-center">
+            <a target="_blank" rel="nofollow noopener" class="text-dark h4" href="/about">
+
+            
+            <img class="author-thumb" src="https://d33wubrfki0l68.cloudfront.net/171bd2d0e4a7332e41a0b825590ab245d21db8e5/5bc25/assets/images/avatars/defender.jpg" alt="Matt Clarke">
+            
+
+            </a>
+        </div>
+        <div class="col-lg-10">
+            <a target="_blank" rel="nofollow noopener" class="text-dark h4" href="/about"
+               title="About the author">Matt Clarke</a>
+            <a target="_blank" rel="nofollow noopener"  href="https://twitter.com/EcommerceMatt" class="btn-sm" title="Twitter"><i class="fab fa-twitter"></i></a>
+            <a target="_blank" rel="nofollow noopener" href="https://www.linkedin.com/in/mattclarke/" class="btn-sm" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+
+            <span class="author-description d-block mt-2">Matt is an Ecommerce and Marketing Director who uses data science to help in his work. Matt has a Master's degree in Internet Retailing (plus two other Master's degrees in different fields) and specialises in the technical side of ecommerce and marketing.</span>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+        
+
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<div class="post-box affiliate-box">
+    <div class="d-flex align-items-center">
+        <div class="col-sm-12 text-left">
+
+            <div class="row">
+                <div class="col-lg-2 col-md-3 col-sm-2 d-none d-sm-block">
+                    <i class="fas fa-award affiliate-icon" aria-hiden="true" aria-hidden="true"></i>
+                </div>
+                <div class="col-lg-10 col-md-9 col-sm-10">
+                    <h3>Unsupervised Learning in Python</h3>
+                    <p>Learn how to cluster, transform, visualize, and extract insights from unlabeled datasets using scikit-learn and scipy.</p>
+
+                    <a href="https://datacamp.com/courses/unsupervised-learning-in-python" rel="nofollow noopener" target="_blank" class="btn btn-primary sidebar-affiliate-box-button" role="button">
+                        Start course for FREE
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+
+
+  </div>
+
+  <div class="col-lg-3 col-md-12">
+      
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<div class="sidebar-affiliate-box">
+    <div class="d-flex align-items-center">
+        <div class="col-sm-12 text-left">
+
+            <div class="row">
+                    <h3>Unsupervised Learning in Python</h3>
+                    <p>Learn how to cluster, transform, visualize, and extract insights from unlabeled datasets using scikit-learn and scipy.</p>
+
+                    <a href="https://datacamp.com/courses/unsupervised-learning-in-python" rel="nofollow noopener sponsored" target="_blank" class="btn btn-primary affiliate-box-button" role="button">
+                        Start course for FREE
+                    </a>
+
+            </div>
+        </div>
+    </div>
+</div>
+<br>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+
+      
+      <div class="row">
+
+
+    
+    <div class="col-lg-12 col-md-6 col-sm-12">
+
+        
+        <div class="blog-grid-item">
+            <div class="sidebar-latest-posts">
+                <div class="card h-100">
+                    <div class="maxthumb">
+                        <a href="/data-science/how-to-calculate-clv-using-bgnbd-and-gamma-gamma">
+                            
+
+                                
+                                    <img class="img-thumb lazyimg sidebar-post" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAACCAQAAAA3fa6RAAAADklEQVR42mNkAANGCAUAACMAA2w/AMgAAAAASUVORK5CYII=" data-src="https://d33wubrfki0l68.cloudfront.net/6bdace95b39d0ac4dbedeb2f61d620b8df6630f4/cfc76/assets/images/posts/desklamp.jpg" alt="How to calculate CLV using BG/NBD and Gamma-Gamma">
+                                
+
+                            
+                        </a>
+                    </div>
+
+                    <div class="card-body">
+                        <h4 class="card-title">
+                            <a class="text-dark" href="/data-science/how-to-calculate-clv-using-bgnbd-and-gamma-gamma">How to calculate CLV using BG/NBD and Gamma-Gamma</a>
+                        </h4>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        
+        <div class="blog-grid-item">
+            <div class="sidebar-latest-posts">
+                <div class="card h-100">
+                    <div class="maxthumb">
+                        <a href="/data-science/how-to-assign-rfm-scores-with-quantile-based-discretization">
+                            
+
+                                
+                                    <img class="img-thumb lazyimg sidebar-post" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAACCAQAAAA3fa6RAAAADklEQVR42mNkAANGCAUAACMAA2w/AMgAAAAASUVORK5CYII=" data-src="https://d33wubrfki0l68.cloudfront.net/933a067d1e999600c5c953766f98ac3e36187b78/aed5f/assets/images/posts/shopping-bags.jpg" alt="How to assign RFM scores with quantile-based discretization">
+                                
+
+                            
+                        </a>
+                    </div>
+
+                    <div class="card-body">
+                        <h4 class="card-title">
+                            <a class="text-dark" href="/data-science/how-to-assign-rfm-scores-with-quantile-based-discretization">How to assign RFM scores with quantile-based discretization</a>
+                        </h4>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        
+        <div class="blog-grid-item">
+            <div class="sidebar-latest-posts">
+                <div class="card h-100">
+                    <div class="maxthumb">
+                        <a href="/machine-learning/how-to-use-nlp-to-identify-what-drives-customer-satisfaction">
+                            
+
+                                
+                                    <img class="img-thumb lazyimg sidebar-post" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAACCAQAAAA3fa6RAAAADklEQVR42mNkAANGCAUAACMAA2w/AMgAAAAASUVORK5CYII=" data-src="https://d33wubrfki0l68.cloudfront.net/b387a891fbf5ccb71c08ff71c77227929c233bdf/d53c4/assets/images/posts/laptop-ports.jpg" alt="How to use NLP to identify what drives customer satisfaction">
+                                
+
+                            
+                        </a>
+                    </div>
+
+                    <div class="card-body">
+                        <h4 class="card-title">
+                            <a class="text-dark" href="/machine-learning/how-to-use-nlp-to-identify-what-drives-customer-satisfaction">How to use NLP to identify what drives customer satisfaction</a>
+                        </h4>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        
+        <div class="blog-grid-item">
+            <div class="sidebar-latest-posts">
+                <div class="card h-100">
+                    <div class="maxthumb">
+                        <a href="/data-science/how-to-segment-customers-based-on-their-value-using-rfm-and-abc">
+                            
+
+                                
+                                    <img class="img-thumb lazyimg sidebar-post" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAACCAQAAAA3fa6RAAAADklEQVR42mNkAANGCAUAACMAA2w/AMgAAAAASUVORK5CYII=" data-src="https://d33wubrfki0l68.cloudfront.net/30298771eb80af6f45327b2cb7d0316032335ac8/e0497/assets/images/posts/abc.jpg" alt="How to segment customers using RFM and ABC">
+                                
+
+                            
+                        </a>
+                    </div>
+
+                    <div class="card-body">
+                        <h4 class="card-title">
+                            <a class="text-dark" href="/data-science/how-to-segment-customers-based-on-their-value-using-rfm-and-abc">How to segment customers using RFM and ABC</a>
+                        </h4>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        
+        <div class="blog-grid-item">
+            <div class="sidebar-latest-posts">
+                <div class="card h-100">
+                    <div class="maxthumb">
+                        <a href="/data-science/how-to-engineer-customer-purchase-latency-features">
+                            
+
+                                
+                                    <img class="img-thumb lazyimg sidebar-post" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAACCAQAAAA3fa6RAAAADklEQVR42mNkAANGCAUAACMAA2w/AMgAAAAASUVORK5CYII=" data-src="https://d33wubrfki0l68.cloudfront.net/a2f906dad8b33fddb93224e9b7add78d2ef0bae8/2bfcf/assets/images/posts/online-shopper.jpg" alt="How to engineer customer purchase latency features">
+                                
+
+                            
+                        </a>
+                    </div>
+
+                    <div class="card-body">
+                        <h4 class="card-title">
+                            <a class="text-dark" href="/data-science/how-to-engineer-customer-purchase-latency-features">How to engineer customer purchase latency features</a>
+                        </h4>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        
+        <div class="blog-grid-item">
+            <div class="sidebar-latest-posts">
+                <div class="card h-100">
+                    <div class="maxthumb">
+                        <a href="/machine-learning/how-to-encode-categorical-variables-for-machine-learning">
+                            
+
+                                
+                                    <img class="img-thumb lazyimg sidebar-post" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAACCAQAAAA3fa6RAAAADklEQVR42mNkAANGCAUAACMAA2w/AMgAAAAASUVORK5CYII=" data-src="https://d33wubrfki0l68.cloudfront.net/a8ec6137d572dca78c535869b793cbffa6e01e0f/86a2f/assets/images/posts/programmer.jpg" alt="How to use Category Encoders to encode categorical variables">
+                                
+
+                            
+                        </a>
+                    </div>
+
+                    <div class="card-body">
+                        <h4 class="card-title">
+                            <a class="text-dark" href="/machine-learning/how-to-encode-categorical-variables-for-machine-learning">How to use Category Encoders to encode categorical variables</a>
+                        </h4>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        
+
+    </div>
+
+
+
+    
+
+
+
+    
+    <div class="col-lg-12 col-md-6 col-sm-12">
+
+        
+        <div class="blog-grid-item">
+            <div class="sidebar-latest-posts">
+                <div class="card h-100">
+                    <div class="maxthumb">
+                        <a href="/data-science/how-to-bin-data-in-pandas-using-cut-and-qcut">
+                            
+
+                                
+                                    <img class="img-thumb lazyimg sidebar-post" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAACCAQAAAA3fa6RAAAADklEQVR42mNkAANGCAUAACMAA2w/AMgAAAAASUVORK5CYII=" data-src="https://d33wubrfki0l68.cloudfront.net/d2243f9eeea8182bb32ba11247db066ea7cfb04a/a18e7/assets/images/posts/wastepaper-bin.jpg" alt="How to bin data in Pandas with cut() and qcut()">
+                                
+
+                            
+                        </a>
+                    </div>
+
+                    <div class="card-body">
+                        <h4 class="card-title">
+                            <a class="text-dark" href="/data-science/how-to-bin-data-in-pandas-using-cut-and-qcut">How to bin data in Pandas with cut() and qcut()</a>
+                        </h4>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        
+        <div class="blog-grid-item">
+            <div class="sidebar-latest-posts">
+                <div class="card h-100">
+                    <div class="maxthumb">
+                        <a href="/data-science/how-to-calculate-the-profitability-of-bogof-and-multibuy-promotions">
+                            
+
+                                
+                                    <img class="img-thumb lazyimg sidebar-post" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAACCAQAAAA3fa6RAAAADklEQVR42mNkAANGCAUAACMAA2w/AMgAAAAASUVORK5CYII=" data-src="https://d33wubrfki0l68.cloudfront.net/fb416e4fee4851327355861b5c0275a7e3ca0dd4/b882a/assets/images/posts/mac-keyboard.jpg" alt="How to calculate the profitability of BOGOF and multibuy promotions">
+                                
+
+                            
+                        </a>
+                    </div>
+
+                    <div class="card-body">
+                        <h4 class="card-title">
+                            <a class="text-dark" href="/data-science/how-to-calculate-the-profitability-of-bogof-and-multibuy-promotions">How to calculate the profitability of BOGOF and multibuy promotions</a>
+                        </h4>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        
+        <div class="blog-grid-item">
+            <div class="sidebar-latest-posts">
+                <div class="card h-100">
+                    <div class="maxthumb">
+                        <a href="/data-science/how-to-analyse-ecommerce-coupon-uplift-with-gapandas">
+                            
+
+                                
+                                    <img class="img-thumb lazyimg sidebar-post" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAACCAQAAAA3fa6RAAAADklEQVR42mNkAANGCAUAACMAA2w/AMgAAAAASUVORK5CYII=" data-src="https://d33wubrfki0l68.cloudfront.net/44c9b90f0a03446462cc041aac1c91694da8d183/efcf4/assets/images/posts/cottonbro.jpg" alt="How to analyse ecommerce coupon uplift with GAPandas">
+                                
+
+                            
+                        </a>
+                    </div>
+
+                    <div class="card-body">
+                        <h4 class="card-title">
+                            <a class="text-dark" href="/data-science/how-to-analyse-ecommerce-coupon-uplift-with-gapandas">How to analyse ecommerce coupon uplift with GAPandas</a>
+                        </h4>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        
+        <div class="blog-grid-item">
+            <div class="sidebar-latest-posts">
+                <div class="card h-100">
+                    <div class="maxthumb">
+                        <a href="/data-science/how-to-use-css-and-xpath-custom-extraction-in-advertools">
+                            
+
+                                
+                                    <img class="img-thumb lazyimg sidebar-post" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAACCAQAAAA3fa6RAAAADklEQVR42mNkAANGCAUAACMAA2w/AMgAAAAASUVORK5CYII=" data-src="https://d33wubrfki0l68.cloudfront.net/44625775b1cd6d6decaf23e11d3b65297c09e45b/3b14f/assets/images/posts/macs.jpg" alt="How to use CSS and XPath custom extraction in Advertools">
+                                
+
+                            
+                        </a>
+                    </div>
+
+                    <div class="card-body">
+                        <h4 class="card-title">
+                            <a class="text-dark" href="/data-science/how-to-use-css-and-xpath-custom-extraction-in-advertools">How to use CSS and XPath custom extraction in Advertools</a>
+                        </h4>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        
+        <div class="blog-grid-item">
+            <div class="sidebar-latest-posts">
+                <div class="card h-100">
+                    <div class="maxthumb">
+                        <a href="/data-science/how-to-scrape-a-website-using-advertools">
+                            
+
+                                
+                                    <img class="img-thumb lazyimg sidebar-post" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAACCAQAAAA3fa6RAAAADklEQVR42mNkAANGCAUAACMAA2w/AMgAAAAASUVORK5CYII=" data-src="https://d33wubrfki0l68.cloudfront.net/77608fd7473dde06a06df3f5f6348e9fde8e59d0/25b23/assets/images/posts/blur-code.jpg" alt="How to scrape a website using Advertools">
+                                
+
+                            
+                        </a>
+                    </div>
+
+                    <div class="card-body">
+                        <h4 class="card-title">
+                            <a class="text-dark" href="/data-science/how-to-scrape-a-website-using-advertools">How to scrape a website using Advertools</a>
+                        </h4>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        
+        <div class="blog-grid-item">
+            <div class="sidebar-latest-posts">
+                <div class="card h-100">
+                    <div class="maxthumb">
+                        <a href="/data-science/how-to-query-the-google-analytics-data-api-for-ga4-with-python">
+                            
+
+                                
+                                    <img class="img-thumb lazyimg sidebar-post" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAACCAQAAAA3fa6RAAAADklEQVR42mNkAANGCAUAACMAA2w/AMgAAAAASUVORK5CYII=" data-src="https://d33wubrfki0l68.cloudfront.net/79675772faadcc9eec937ee9566c5047a7e3ac0c/ffd4f/assets/images/posts/gapandas4.jpg" alt="How to query the Google Analytics Data API for GA4 using Python">
+                                
+
+                            
+                        </a>
+                    </div>
+
+                    <div class="card-body">
+                        <h4 class="card-title">
+                            <a class="text-dark" href="/data-science/how-to-query-the-google-analytics-data-api-for-ga4-with-python">How to query the Google Analytics Data API for GA4 using Python</a>
+                        </h4>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        
+
+    </div>
+
+
+
+
+    
+    <div class="col-lg-12 col-md-6 col-sm-12">
+
+        
+        <div class="blog-grid-item">
+            <div class="sidebar-latest-posts">
+                <div class="card h-100">
+                    <div class="maxthumb">
+                        <a href="/data-science/how-to-bin-data-in-pandas-using-cut-and-qcut">
+                            
+
+                                
+                                    <img class="img-thumb lazyimg sidebar-post" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAACCAQAAAA3fa6RAAAADklEQVR42mNkAANGCAUAACMAA2w/AMgAAAAASUVORK5CYII=" data-src="https://d33wubrfki0l68.cloudfront.net/d2243f9eeea8182bb32ba11247db066ea7cfb04a/a18e7/assets/images/posts/wastepaper-bin.jpg" alt="How to bin data in Pandas with cut() and qcut()">
+                                
+
+                            
+                        </a>
+                    </div>
+
+                    <div class="card-body">
+                        <h4 class="card-title">
+                            <a class="text-dark" href="/data-science/how-to-bin-data-in-pandas-using-cut-and-qcut">How to bin data in Pandas with cut() and qcut()</a>
+                        </h4>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        
+        <div class="blog-grid-item">
+            <div class="sidebar-latest-posts">
+                <div class="card h-100">
+                    <div class="maxthumb">
+                        <a href="/data-science/how-to-calculate-the-profitability-of-bogof-and-multibuy-promotions">
+                            
+
+                                
+                                    <img class="img-thumb lazyimg sidebar-post" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAACCAQAAAA3fa6RAAAADklEQVR42mNkAANGCAUAACMAA2w/AMgAAAAASUVORK5CYII=" data-src="https://d33wubrfki0l68.cloudfront.net/fb416e4fee4851327355861b5c0275a7e3ca0dd4/b882a/assets/images/posts/mac-keyboard.jpg" alt="How to calculate the profitability of BOGOF and multibuy promotions">
+                                
+
+                            
+                        </a>
+                    </div>
+
+                    <div class="card-body">
+                        <h4 class="card-title">
+                            <a class="text-dark" href="/data-science/how-to-calculate-the-profitability-of-bogof-and-multibuy-promotions">How to calculate the profitability of BOGOF and multibuy promotions</a>
+                        </h4>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        
+        <div class="blog-grid-item">
+            <div class="sidebar-latest-posts">
+                <div class="card h-100">
+                    <div class="maxthumb">
+                        <a href="/data-science/how-to-analyse-ecommerce-coupon-uplift-with-gapandas">
+                            
+
+                                
+                                    <img class="img-thumb lazyimg sidebar-post" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAACCAQAAAA3fa6RAAAADklEQVR42mNkAANGCAUAACMAA2w/AMgAAAAASUVORK5CYII=" data-src="https://d33wubrfki0l68.cloudfront.net/44c9b90f0a03446462cc041aac1c91694da8d183/efcf4/assets/images/posts/cottonbro.jpg" alt="How to analyse ecommerce coupon uplift with GAPandas">
+                                
+
+                            
+                        </a>
+                    </div>
+
+                    <div class="card-body">
+                        <h4 class="card-title">
+                            <a class="text-dark" href="/data-science/how-to-analyse-ecommerce-coupon-uplift-with-gapandas">How to analyse ecommerce coupon uplift with GAPandas</a>
+                        </h4>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        
+        <div class="blog-grid-item">
+            <div class="sidebar-latest-posts">
+                <div class="card h-100">
+                    <div class="maxthumb">
+                        <a href="/data-science/how-to-use-css-and-xpath-custom-extraction-in-advertools">
+                            
+
+                                
+                                    <img class="img-thumb lazyimg sidebar-post" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAACCAQAAAA3fa6RAAAADklEQVR42mNkAANGCAUAACMAA2w/AMgAAAAASUVORK5CYII=" data-src="https://d33wubrfki0l68.cloudfront.net/44625775b1cd6d6decaf23e11d3b65297c09e45b/3b14f/assets/images/posts/macs.jpg" alt="How to use CSS and XPath custom extraction in Advertools">
+                                
+
+                            
+                        </a>
+                    </div>
+
+                    <div class="card-body">
+                        <h4 class="card-title">
+                            <a class="text-dark" href="/data-science/how-to-use-css-and-xpath-custom-extraction-in-advertools">How to use CSS and XPath custom extraction in Advertools</a>
+                        </h4>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        
+        <div class="blog-grid-item">
+            <div class="sidebar-latest-posts">
+                <div class="card h-100">
+                    <div class="maxthumb">
+                        <a href="/data-science/how-to-scrape-a-website-using-advertools">
+                            
+
+                                
+                                    <img class="img-thumb lazyimg sidebar-post" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAACCAQAAAA3fa6RAAAADklEQVR42mNkAANGCAUAACMAA2w/AMgAAAAASUVORK5CYII=" data-src="https://d33wubrfki0l68.cloudfront.net/77608fd7473dde06a06df3f5f6348e9fde8e59d0/25b23/assets/images/posts/blur-code.jpg" alt="How to scrape a website using Advertools">
+                                
+
+                            
+                        </a>
+                    </div>
+
+                    <div class="card-body">
+                        <h4 class="card-title">
+                            <a class="text-dark" href="/data-science/how-to-scrape-a-website-using-advertools">How to scrape a website using Advertools</a>
+                        </h4>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        
+        <div class="blog-grid-item">
+            <div class="sidebar-latest-posts">
+                <div class="card h-100">
+                    <div class="maxthumb">
+                        <a href="/data-science/how-to-query-the-google-analytics-data-api-for-ga4-with-python">
+                            
+
+                                
+                                    <img class="img-thumb lazyimg sidebar-post" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAACCAQAAAA3fa6RAAAADklEQVR42mNkAANGCAUAACMAA2w/AMgAAAAASUVORK5CYII=" data-src="https://d33wubrfki0l68.cloudfront.net/79675772faadcc9eec937ee9566c5047a7e3ac0c/ffd4f/assets/images/posts/gapandas4.jpg" alt="How to query the Google Analytics Data API for GA4 using Python">
+                                
+
+                            
+                        </a>
+                    </div>
+
+                    <div class="card-body">
+                        <h4 class="card-title">
+                            <a class="text-dark" href="/data-science/how-to-query-the-google-analytics-data-api-for-ga4-with-python">How to query the Google Analytics Data API for GA4 using Python</a>
+                        </h4>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        
+
+    </div>
+
+
+
+
+</div>
+
+
+
+
+
+      
+      
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<div class="sidebar-affiliate-box">
+    <div class="d-flex align-items-center">
+        <div class="col-sm-12 text-left">
+
+            <div class="row">
+                    <h3>Cluster Analysis in Python</h3>
+                    <p>In this course, you will be introduced to unsupervised learning through techniques such as hierarchical and k-means clustering using the SciPy library.</p>
+
+                    <a href="https://datacamp.com/courses/cluster-analysis-in-python" rel="nofollow noopener sponsored" target="_blank"
+                       class="btn btn-primary affiliate-box-button" role="button">
+                        Start course for FREE
+                    </a>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+
+
+  </div>
+</div>
+
+<div class="row">
+    <!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h3 class="text-center mb-4">Other posts you might like</h3>
+    
+
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/data-science/how-to-changes-pandas-dataframe-settings-and-options">
+                
+
+                    
+                        <img class="img-thumb lazyimg" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAACCAQAAAA3fa6RAAAADklEQVR42mNkAANGCAUAACMAA2w/AMgAAAAASUVORK5CYII=" data-src="https://d33wubrfki0l68.cloudfront.net/301e81a443de17db92093e18c7cdaf5e90d93467/2d88e/assets/images/posts/pixabay-glasses.jpg" alt="How to change Pandas dataframe settings and options">
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h3 class="card-title">
+                <a class="text-dark" href="/data-science/how-to-changes-pandas-dataframe-settings-and-options">How to change Pandas dataframe settings and options</a>
+                
+            </h3>
+            <h4 class="card-text">When loading data into a Pandas dataframe, you’ll often find that data is truncated, columns are replaced with an ellipsis, or that the float precision makes numbers harder to read....</h4>
+        </div>
+
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/data-science/how-to-identify-and-change-pandas-dtypes-using-info-and-astype">
+                
+
+                    
+                        <img class="img-thumb lazyimg" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAACCAQAAAA3fa6RAAAADklEQVR42mNkAANGCAUAACMAA2w/AMgAAAAASUVORK5CYII=" data-src="https://d33wubrfki0l68.cloudfront.net/b127979306a3ed2b8c20bd947831323e6a0da4fd/a3048/assets/images/posts/teona-swift-plants-desk.jpg" alt="How to identify and change Pandas dtypes using info() and astype()">
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h3 class="card-title">
+                <a class="text-dark" href="/data-science/how-to-identify-and-change-pandas-dtypes-using-info-and-astype">How to identify and change Pandas dtypes using info() and astype()</a>
+                
+            </h3>
+            <h4 class="card-text">Data comes in many forms, from integers and floats, to strings, dates, and timedeltas. These different types of data are known as data types, or in Pandas dtypes, and using...</h4>
+        </div>
+
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/data-science/how-to-find-the-differences-between-two-pandas-dataframes">
+                
+
+                    
+                        <img class="img-thumb lazyimg" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAACCAQAAAA3fa6RAAAADklEQVR42mNkAANGCAUAACMAA2w/AMgAAAAASUVORK5CYII=" data-src="https://d33wubrfki0l68.cloudfront.net/3a0037927486c80de7889776f85cb7b9e5c328b3/efb7d/assets/images/posts/pexels-ylanite-koppens-plants.jpg" alt="How to find the differences between two Pandas dataframes">
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h3 class="card-title">
+                <a class="text-dark" href="/data-science/how-to-find-the-differences-between-two-pandas-dataframes">How to find the differences between two Pandas dataframes</a>
+                
+            </h3>
+            <h4 class="card-text">When working with data, one common thing you’ll be tasked with doing is identifying what’s changed. For example, let’s say you’ve used your web scraping skills to build an ecommerce...</h4>
+        </div>
+
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>
+
+</div>
+</div>
+
+
+        </div>
+    </div>
+    
+    
+<div class="newsletter-bar">
+    <div class="container">
+
+        <h3 class="newsletter-bar-header">Get the newsletter</h3>
+
+        <form action="https://practicaldatascience.us1.list-manage.com/subscribe/post?u=3f5b8fd2b6165fe369306cda3&amp;id=c6043d44bb" method="post" name="mc-embedded-subscribe-form" target="_blank" class="newsletter-bar-form" novalidate>
+
+            
+            <div style="position: absolute; left: -5000px;">
+                <label for="blank">Label</label>
+                <input type="text" id="blank" name="b_3f5b8fd2b6165fe369306cda3_c6043d44bb" tabindex="-1" value="">
+            </div>
+            
+
+            <label for="mce-EMAIL" class="newsletter-bar-standfirst">Subscribe to receive data science updates</label>
+            <input type="email" placeholder="Enter your email" name="EMAIL" class="required email input-lg" id="mce-EMAIL" autocomplete="on" required>
+            <input type="submit" value="Subscribe" name="subscribe" class="newsletter-bar-form-button">
+
+        </form>
+
+    </div>
+</div>
+
+
+    
+
+
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-md-4 col-sm-12 text-lg-left footer-column">
+                <h3>Categories</h3>
+                <ul>
+                    
+                    <li><a href="/data-science">Data Science</a></li>
+                    
+                    <li><a href="/machine-learning">Machine Learning</a></li>
+                    
+                    <li><a href="/data-engineering">Data Engineering</a></li>
+                    
+                    <li><a href="/data-science-courses">Data Science Courses</a></li>
+                </ul>
+            </div>
+
+            <div class="col-md-4 col-sm-12 text-lg-left footer-column">
+                <h3>Site</h3>
+                <ul>
+                    <li><a href="/sitemap">Sitemap</a></li>
+                    <li><a href="/about">About</a></li>
+                    <li><a href="https://www.linkedin.com/in/mattclarke/" target="_blank" rel="nofollow noopener">LinkedIn</a></li>
+                    <li><a href="https://github.com/practical-data-science" target="_blank" rel="nofollow noopener">GitHub</a></li>
+                </ul>
+            </div>
+
+            <div class="col-md-4 col-sm-12 text-lg-left footer-column">
+                <h3>The Practical Data Science blog</h3>
+                <p>The Practical Data Science blog is written by <a href="/about">Matt Clarke</a>, an Ecommerce and Marketing Director who specialises in data science and machine learning for marketing and retail.
+                The site provides articles and tutorials on data science, machine learning, and data engineering to help you improve your business and your data science skills.
+                </p>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <span class="copyright">Copyright © 2022 Practical Data Science</span>
+        </div>
+
+    </div>
+
+</footer>
+
+</div>
+<script src='https://d33wubrfki0l68.cloudfront.net/js/8bffb2f9d34bfa25d90b02e2a7d4c3fc0a5af3fe/assets/js/jquery.min.js'></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"  rel="preconnect"></script>
+<script src="https://kit.fontawesome.com/7d6b1cbe84.js" crossorigin="anonymous"  rel="preconnect"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha/js/umd/util.js" rel="preconnect"></script>
+
+<script src='https://d33wubrfki0l68.cloudfront.net/bundles/71cae929cd5d78cdf03ac49eaea487993be6b5ba.js'></script>
+
+
+
+<script id="mcjs">!function(c,h,i,m,p){m=c.createElement(h),p=c.getElementsByTagName(h)[0],m.async=1,m.src=i,p.parentNode.insertBefore(m,p)}(document,"script","https://chimpstatic.com/mcjs-connected/js/users/3f5b8fd2b6165fe369306cda3/651e9e3d2dc701c317cd8c06a.js");</script>
+
+<script data-ad-client="ca-pub-2725362857381836" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<script type="text/javascript">(function(i,m,p,a,c,t){c.ire_o=p;c[p]=c[p]||function(){(c[p].a=c[p].a||[]).push(arguments)};t=a.createElement(m);var z=a.getElementsByTagName(m)[0];t.async=1;t.src=i;z.parentNode.insertBefore(t,z)})('https://utt.impactcdn.com/P-A2853085-e8cb-4b5b-8a4c-6bf3771c83991.js','script','impactStat',document,window);impactStat('transformLinks');impactStat('trackImpression');</script>
+
+
+</body>
+</html>
